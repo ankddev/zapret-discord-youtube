@@ -1,16 +1,16 @@
 mod utils;
 
 use spinners::{Spinner, Spinners};
+use std::io::stdin;
+use std::path::Path;
 use std::{fs, io};
 use walkdir::WalkDir;
 use zip::write::ZipWriter;
-use std::io::stdin;
-use std::path::Path;
 
 fn main() -> io::Result<()> {
     print!("\x1b]9;4;3;\x1b\\");
     println!("[1/4] Preparing");
-    
+
     let temp_dir = std::env::temp_dir();
 
     let current_directory = std::env::current_dir().expect("Failed to get current directory");
@@ -84,10 +84,7 @@ fn main() -> io::Result<()> {
 
     let mut spinner = Spinner::new(Spinners::Dots, "[3/4] Archiving files".into());
 
-    let zip_path = current_directory.join(format!(
-        "zapret-discord-youtube-ankddev-v{}.zip",
-        env!("CARGO_PKG_VERSION")
-    ));
+    let zip_path = current_directory.join("zapret-discord-youtube-ankddev.zip");
     let zip_file = fs::File::create(&zip_path).expect("Failed to create archive");
     let mut zip = ZipWriter::new(zip_file);
 
@@ -135,7 +132,10 @@ fn main() -> io::Result<()> {
     spinner.stop_and_persist("[4/4]".into(), "Cache cleaned".into());
     print!("\x1b]9;4;0;\x1b\\");
 
-    println!("Release build ready! Check `{}`.\nPress ENTER to continue.", &zip_path.display());
+    println!(
+        "Release build ready! Check `{}`.\nPress ENTER to continue.",
+        &zip_path.display()
+    );
 
     let mut input = String::new();
     stdin().read_line(&mut input).expect("Failed to read input");
