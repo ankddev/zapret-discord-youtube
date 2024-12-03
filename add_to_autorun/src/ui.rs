@@ -227,7 +227,7 @@ pub fn run_main_loop(
 ) -> io::Result<()> {
     let mut current_selection = 0;
     let mut scroll_offset = 0;
-    let max_visible_options = std::cmp::min(15, (term_height as usize - start_row - 3));
+    let max_visible_options = std::cmp::min(15, term_height as usize - start_row - 3);
 
     let mut last_event_time = Instant::now();
     let mut last_render_time = Instant::now();

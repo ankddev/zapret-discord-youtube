@@ -1,7 +1,4 @@
-use {
-    std::{env, io},
-    winresource::WindowsResource,
-};
+use std::io;
 
 fn main() -> io::Result<()> {
     if cfg!(target_os = "windows") {
