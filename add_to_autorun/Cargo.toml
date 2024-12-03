@@ -1,0 +1,19 @@
+[package]
+name = "add_to_autorun"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[package.metadata.winresource]
+LegalCopyright = "2024 by ANKDDEV"
+OriginalFilename = "zapret_autorunner.exe"
+
+[dependencies]
+crossterm = "0.28.1"
+ctrlc = "3.4.1"
+winresource = "0.1.17"
+regex = "1.11.1"
+
+[build-dependencies]
+# Used for embedding resources in the executable
+winresource = "0.1.18"
