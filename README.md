@@ -4,7 +4,7 @@
 This build includes files from [official repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities.
 # Getting started
 ## Download
-You can download this build from [releases](https://github.com/ankddev/zapret-discord-youtube/releases).
+You can download this build from [releases](https://github.com/ankddev/zapret-discord-youtube/releases) or [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
 ## Usage
 * Disable all VPNs, Zapret, GoodbyeDPi, Warp and other similar software
 * **Unzip** downloaded archive
