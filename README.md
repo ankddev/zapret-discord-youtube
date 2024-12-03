@@ -98,7 +98,7 @@ This project is separated in few folders:
 * `lists` contains lists of domains to work with
 * `resources` contains `README.txt` and `blockcheck.cmd` files
 Following directories contain `Rust` code or utilities, packaged in build, all of them united to `cargo workspace` so you should run all Cargo commands from root directory of project:
-* `make_release` contains source code for make-release util  which isn't pacakged with build. It helps to create archive with build of projects. Currentlyx you must open it from target directory, so if you running it from terminal tou should firstly go to `target/release` or `target/debuh` directories
+* `make_release` contains source code for make-release util  which isn't pacakged with build. It helps to create archive with build of projects. Currentlyx you must open it from target directory, so if you running it from terminal tou should firstly go to `target/release` or `target/debug` directories
 * `add_to_autorun` contains code for utility that helps you to add fix to autorun
 * `select_domains` contains source code for util that helps you to select domains for DPI
 * `preconfig_tester` helps you to test pre-configs
