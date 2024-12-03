@@ -1,7 +1,7 @@
 <h1 align="center">zapret-discord-youtube</h1>
 <h6 align="center">Zapret build for Windows for fixing YouTube and Discord in Russia</h6>
 
-This build includes files from [official repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities.
+This build includes files from [original repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities.
 # Getting started
 ## Download
 You can download this build from [releases](https://github.com/ankddev/zapret-discord-youtube/releases) or [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
