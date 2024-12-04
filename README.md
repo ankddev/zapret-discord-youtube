@@ -25,7 +25,7 @@ List `russia-blacklist.txt` contains all [known blocked](https://antizapret.pros
 
 # Troubleshooting
 ## No one of pre-configs helps
-Firstly, check **all** pre-configs all run `Automatically search pre-config.exe`. If this doesn't help you, use BLOCKCHECK.
+Firstly, check **all** pre-configs or run `Automatically search pre-config.exe`. If this doesn't help you, use BLOCKCHECK.
 
 * Run `blockcheck.cmd`
 * Enter domain to check
