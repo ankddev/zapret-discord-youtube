@@ -6,7 +6,7 @@ This build includes files from [original repository](https://github.com/bol-van/
 ## Download
 You can download this build from [releases](https://github.com/ankddev/zapret-discord-youtube/releases) or [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
 ## Usage
-* Disable all VPNs, Zapret, GoodbyeDPi, Warp and other similar software
+* Disable all VPNs, Zapret, GoodbyeDPI, Warp and other similar software
 * **Unzip** downloaded archive
 * Go to "pre-configs" folder
 * Run one of BAT files in this folder
