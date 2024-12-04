@@ -103,8 +103,8 @@ Following directories contain `Rust` code or utilities, packaged in build, all o
 * `select_domains` contains source code for util that helps you to select domains for DPI
 * `preconfig_tester` helps you to test pre-configs
 # Credits
-* Zapret - https://github.com/bol-van/zapret
-* Zapret Win Bundle - https://github.com/bol-van/zapret-win-bundle
-* WinDivert - https://github.com/basil00/WinDivert
-* Zapret Discord - https://github.com/Flowseal/zapret-discord-youtube
-* Zapret Discord YouTube - https://howdyho.net/windows-software/discord-fix-snova-rabotayushij-diskord-vojs-zvonki
+* [Zapret](https://github.com/bol-van/zapret)
+* [Zapret Win Bundle](https://github.com/bol-van/zapret-win-bundle)
+* [WinDivert](https://github.com/basil00/WinDivert)
+* [Zapret Discord](https://github.com/Flowseal/zapret-discord-youtube)
+* [Zapret Discord YouTube](https://howdyho.net/windows-software/discord-fix-snova-rabotayushij-diskord-vojs-zvonki)
