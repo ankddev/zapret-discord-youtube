@@ -166,7 +166,7 @@ fn run_bypass_check(
     let batch_files = config.get_batch_files()?;
     let mut success = false;
 
-    let domain_without_port = config.target_domain.split(':').next().unwrap_or("");
+    let domain_without_port = config.target_domain.split(':').next().unwrap_or_default();
 
     println!("\nStarting testing domain: {}", config.target_domain);
     println!("------------------------------------------------");
