@@ -75,7 +75,7 @@ fn draw_screen(
         );
 
         if *index == current_index {
-            writeln!(stdout, "{}", line.reverse())?;
+            writeln!(stdout, "{}", line.reverse().cyan())?;
         } else {
             writeln!(stdout, "{}", line)?;
         }
