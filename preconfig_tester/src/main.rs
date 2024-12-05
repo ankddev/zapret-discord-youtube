@@ -37,6 +37,7 @@ const DOMAIN_LIST: &[(&str, &str)] = &[
     ("4", "speedtest.net"),
     ("5", "steampowered.com"),
     ("6", "custom"),
+    ("0", "exit"),
 ];
 
 const ORANGE: Color = Color::Rgb(252, 197, 108);
@@ -48,7 +49,9 @@ const RED: Color = Color::Rgb(214, 77, 91);
 fn get_domain_choice() -> io::Result<String> {
     println!("\nSelect domain for checking:");
     for (number, domain) in DOMAIN_LIST {
-        if *domain == "custom" {
+        if *domain == "exit" {
+            println!("{}. Exit", number);
+        } else if *domain == "custom" {
             println!("{}. Enter your own domain", number);
         } else {
             println!("{}. {}", number, domain);
@@ -64,7 +67,11 @@ fn get_domain_choice() -> io::Result<String> {
         let choice = choice.trim();
 
         if let Some((_, domain)) = DOMAIN_LIST.iter().find(|(num, _)| *num == choice) {
-            if *domain == "custom" {
+            if *domain == "exit" {
+                print!("Exiting..");
+                stdout().flush()?;
+                std::process::exit(0);
+            } else if *domain == "custom" {
                 print!("Enter domain (for example, example.com): ");
                 stdout().flush()?;
 
@@ -83,8 +90,8 @@ fn get_domain_choice() -> io::Result<String> {
             }
         } else {
             println!(
-                "Invalid selection. Please select number from 1 to {}",
-                DOMAIN_LIST.len()
+                "Invalid selection. Please select number from 0 to {}",
+                DOMAIN_LIST.len() - 1
             );
         }
     }
