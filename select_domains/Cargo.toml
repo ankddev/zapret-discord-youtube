@@ -1,6 +1,6 @@
 [package]
 name = "select_domains"
-version = "1.0.0"
+version.workspace = true
 edition = "2021"
 build = "build.rs"
 

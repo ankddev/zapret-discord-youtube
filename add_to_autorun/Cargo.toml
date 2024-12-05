@@ -1,6 +1,6 @@
 [package]
 name = "add_to_autorun"
-version = "1.0.0"
+version.workspace = true
 edition = "2021"
 build = "build.rs"
 
