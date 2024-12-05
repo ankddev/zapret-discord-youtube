@@ -51,7 +51,7 @@ fn draw_screen(
     // Header section
     writeln!(
         stdout,
-        "Use ↑↓ arrows for navigation, SPACE or ENTER to select\n"
+        "Use ↑↓ (arrows) for navigation, SPACE or ENTER to select\n"
     )?;
 
     // Draw control options first
