@@ -1,4 +1,3 @@
-use native_tls;
 use std::error::Error;
 use std::fmt;
 use std::io; // Import the native_tls crate

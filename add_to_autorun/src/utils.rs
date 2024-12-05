@@ -82,7 +82,7 @@ fn split_filename(name: &str) -> (String, String, String, bool) {
 pub fn run_powershell_command_with_output(command: &str) -> io::Result<String> {
     println!("{}", command);
     let output = Command::new("powershell")
-        .args(&["-NoProfile", "-NonInteractive", "-Command", command])
+        .args(["-NoProfile", "-NonInteractive", "-Command", command])
         .output()
         .map_err(|e| {
             io::Error::new(
@@ -115,7 +115,7 @@ pub fn run_powershell_command_with_output(command: &str) -> io::Result<String> {
 
 pub fn run_powershell_command(command: &str) -> io::Result<()> {
     let output = Command::new("powershell")
-        .args(&["-Command", command])
+        .args(["-Command", command])
         .output()
         .map_err(|e| {
             io::Error::new(

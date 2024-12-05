@@ -93,14 +93,12 @@ impl NetworkChecker {
                     let initial_domain = extract_domain(&initial_url);
                     let final_domain = extract_domain(&final_url);
 
-                    if initial_domain != final_domain {
-                        if is_block_page_url(&final_url) {
-                            println!(
-                                "DEBUG: Detected redirect to potential block page: {}",
-                                final_url
-                            );
-                            return Ok(ConnectionResult::ISPBlock);
-                        }
+                    if initial_domain != final_domain && is_block_page_url(&final_url) {
+                        println!(
+                            "DEBUG: Detected redirect to potential block page: {}",
+                            final_url
+                        );
+                        return Ok(ConnectionResult::ISPBlock);
                     }
                 }
 

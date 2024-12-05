@@ -20,7 +20,7 @@ impl ProcessManager {
 
     pub fn run_batch_file(&self, batch_file: &Path) -> std::io::Result<Child> {
         Command::new("cmd")
-            .args(&["/C", &batch_file.to_string_lossy()])
+            .args(["/C", &batch_file.to_string_lossy()])
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()

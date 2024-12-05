@@ -68,19 +68,19 @@ fn main() -> io::Result<()> {
     )
     .expect("Failed to copy `add_to_autorun.exe`");
     fs_extra::file::copy(
-        &resources_path.join("___README.TXT"),
+        resources_path.join("___README.TXT"),
         &new_readme_path,
         &copy_options,
     )
     .expect("Failed to copy `___readme.txt`");
     fs_extra::file::copy(
-        &resources_path.join("blockcheck.cmd"),
+        resources_path.join("blockcheck.cmd"),
         &new_blockcheck_path,
         &copy_options,
     )
     .expect("Failed to copy `blockcheck.cmd`");
 
-    spinner.stop_and_persist("[2/4]".into(), "Files copied".into());
+    spinner.stop_and_persist("[2/4]", "Files copied".into());
 
     let mut spinner = Spinner::new(Spinners::Dots, "[3/4] Archiving files".into());
 
@@ -119,7 +119,7 @@ fn main() -> io::Result<()> {
 
     zip.finish()?;
 
-    spinner.stop_and_persist("[3/4]".into(), "Files archived".into());
+    spinner.stop_and_persist("[3/4]", "Files archived".into());
 
     let mut spinner = Spinner::new(Spinners::Dots, "[4/4] Cleaning cache".into());
 
@@ -129,7 +129,7 @@ fn main() -> io::Result<()> {
     fs_extra::file::remove(&new_blockcheck_path).expect("Failed to delete file");
     fs_extra::file::remove(&new_pre_config_tester_path).expect("Failed to delete file");
 
-    spinner.stop_and_persist("[4/4]".into(), "Cache cleaned".into());
+    spinner.stop_and_persist("[4/4]", "Cache cleaned".into());
     print!("\x1b]9;4;0;\x1b\\");
 
     println!(

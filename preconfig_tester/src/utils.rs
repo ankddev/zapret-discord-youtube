@@ -65,7 +65,7 @@ pub fn request_elevation() -> io::Result<()> {
         let quoted_executable = format!("\"{}\"", executable);
         // Use start /b to prevent new console window creation and run PowerShell hidden
         let spawn_result = Command::new("cmd")
-            .args(&[
+            .args([
                 "/C",
                 "start",
                 "/b",
