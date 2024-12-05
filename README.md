@@ -6,7 +6,7 @@
   <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ankddev/zapret-discord-youtube?style=flat">
 </div>
 
-This build includes files from [original repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities.
+This build includes files from [original repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities, written in Rust.
 # Getting started
 ## Download
 You can download this build from [releases](https://github.com/ankddev/zapret-discord-youtube/releases) or [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
