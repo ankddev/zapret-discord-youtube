@@ -1,12 +1,12 @@
 <h1 align="center">zapret-discord-youtube</h1>
 <h6 align="center">Zapret build for Windows for fixing YouTube and Discord in Russia</h6>
 
-This build includes files from [official repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities.
+This build includes files from [original repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities.
 # Getting started
 ## Download
 You can download this build from [releases](https://github.com/ankddev/zapret-discord-youtube/releases) or [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
 ## Usage
-* Disable all VPNs, Zapret, GoodbyeDPi, Warp and other similar software
+* Disable all VPNs, Zapret, GoodbyeDPI, Warp and other similar software
 * **Unzip** downloaded archive
 * Go to "pre-configs" folder
 * Run one of BAT files in this folder
@@ -25,7 +25,7 @@ List `russia-blacklist.txt` contains all [known blocked](https://antizapret.pros
 
 # Troubleshooting
 ## No one of pre-configs helps
-Firstly, check **all** pre-configs all run `Automatically search pre-config.exe`. If this doesn't help you, use BLOCKCHECK.
+Firstly, check **all** pre-configs or run `Automatically search pre-config.exe`. If this doesn't help you, use BLOCKCHECK.
 
 * Run `blockcheck.cmd`
 * Enter domain to check
@@ -91,3 +91,20 @@ cargo fmt
 
 ## Building
 To build this run `cargo build --release`. Then go to `target/release` folder and run `make_release.exe` to make ZIP archive with all files.
+## Structure of project
+This project is separated in few folders:
+* `bin` contains pre-built binaries from original project
+* `pre-configs` contains pre-configs (BAT files)
+* `lists` contains lists of domains to work with
+* `resources` contains `README.txt` and `blockcheck.cmd` files
+Following directories contain `Rust` code or utilities, packaged in build, all of them united to `cargo workspace` so you should run all Cargo commands from root directory of project:
+* `make_release` contains source code for make-release util  which isn't pacakged with build. It helps to create archive with build of projects. Currentlyx you must open it from target directory, so if you running it from terminal tou should firstly go to `target/release` or `target/debug` directories
+* `add_to_autorun` contains code for utility that helps you to add fix to autorun
+* `select_domains` contains source code for util that helps you to select domains for DPI
+* `preconfig_tester` helps you to test pre-configs
+# Credits
+* [Zapret](https://github.com/bol-van/zapret)
+* [Zapret Win Bundle](https://github.com/bol-van/zapret-win-bundle)
+* [WinDivert](https://github.com/basil00/WinDivert)
+* [Zapret Discord](https://github.com/Flowseal/zapret-discord-youtube)
+* [Zapret Discord YouTube](https://howdyho.net/windows-software/discord-fix-snova-rabotayushij-diskord-vojs-zvonki)
