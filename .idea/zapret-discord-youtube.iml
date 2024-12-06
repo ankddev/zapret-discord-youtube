@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/select_domains/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/preconfig_tester/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/make_release/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/run_preconfig/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

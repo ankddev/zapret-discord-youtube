@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "add_to_autorun", "make_release", "preconfig_tester", "select_domains",
+    "add_to_autorun", "make_release", "preconfig_tester", "run_preconfig", "select_domains",
 ]
 
 [workspace.package]

@@ -34,6 +34,9 @@ fn main() -> io::Result<()> {
     let add_to_autorun_path = current_directory.join("add_to_autorun.exe");
     assert!(add_to_autorun_path.exists());
 
+    let run_preconfig_path = current_directory.join("run_preconfig.exe");
+    assert!(run_preconfig_path.exists());
+
     let select_domains_path = current_directory.join("select_domains.exe");
     assert!(select_domains_path.exists());
 
@@ -46,6 +49,7 @@ fn main() -> io::Result<()> {
     let new_select_domains_path = temp_dir.join("Set domain list.exe");
     let new_pre_config_tester_path = temp_dir.join("Automatically search pre-config.exe");
     let new_add_to_autorun_path = temp_dir.join("Add to autorun.exe");
+    let new_run_preconfig_path = temp_dir.join("Run pre-config.exe");
     let new_readme_path = temp_dir.join("___README.TXT");
     let new_blockcheck_path = temp_dir.join("blockcheck.cmd");
 
@@ -61,6 +65,12 @@ fn main() -> io::Result<()> {
         &copy_options,
     )
     .expect("Failed to copy `preconfig_tester.exe`");
+    fs_extra::file::copy(
+        &run_preconfig_path,
+        &new_run_preconfig_path,
+        &copy_options,
+    )
+    .expect("Failed to copy `run_preconfig.exe`");
     fs_extra::file::copy(
         &add_to_autorun_path,
         &new_add_to_autorun_path,
@@ -116,6 +126,8 @@ fn main() -> io::Result<()> {
         .expect("Failed to add file to zip");
     utils::add_file_to_zip(&new_pre_config_tester_path, &temp_dir, &mut zip)
         .expect("Failed to add file to zip");
+    utils::add_file_to_zip(&new_run_preconfig_path, &temp_dir, &mut zip)
+        .expect("Failed to add file to zip");
 
     zip.finish()?;
 
@@ -128,6 +140,7 @@ fn main() -> io::Result<()> {
     fs_extra::file::remove(&new_select_domains_path).expect("Failed to delete file");
     fs_extra::file::remove(&new_blockcheck_path).expect("Failed to delete file");
     fs_extra::file::remove(&new_pre_config_tester_path).expect("Failed to delete file");
+    fs_extra::file::remove(&new_run_preconfig_path).expect("Failed to delete file");
 
     spinner.stop_and_persist("[4/4]", "Cache cleaned".into());
     print!("\x1b]9;4;0;\x1b\\");

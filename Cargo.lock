@@ -1241,6 +1241,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "run_preconfig"
+version = "1.0.1"
+dependencies = [
+ "crossterm",
+ "ctrlc",
+ "winresource",
+]
+
+[[package]]
 name = "rust-ini"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
