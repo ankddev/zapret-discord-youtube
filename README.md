@@ -20,6 +20,9 @@ You can download this build from [releases](https://github.com/ankddev/zapret-di
   * YouTubeFix - YouTube
 * Enjoy it!
 
+> [!TIP]
+> Also you can run file `Run pre-config.exe` and select pre-config to run it
+
 ## Add to autorun
 To add fix to autorun, start `Add to autorun.exe` and select on of presented BAT files. To delete from autorun, start this file and select `Delete service from autorun` option.
 
@@ -107,6 +110,7 @@ Following directories contain `Rust` code or utilities, packaged in build, all o
 * `add_to_autorun` contains code for utility that helps you to add fix to autorun
 * `select_domains` contains source code for util that helps you to select domains for DPI
 * `preconfig_tester` helps you to test pre-configs
+* `run_preconfig` helps to run pre-configs
 # Credits
 * [Zapret](https://github.com/bol-van/zapret)
 * [Zapret Win Bundle](https://github.com/bol-van/zapret-win-bundle)
