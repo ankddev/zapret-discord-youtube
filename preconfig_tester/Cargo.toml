@@ -9,7 +9,7 @@ LegalCopyright = "2024 by ANKDDEV"
 OriginalFilename = "zapret_preconfig_tester.exe"
 
 [dependencies]
-sysinfo = "0.32.0"
+sysinfo = "0.33.0"
 config = "0.14.1"
 native-tls = "0.2.12"
 ureq = { version = "2.10.1", features = ["tls"] }
