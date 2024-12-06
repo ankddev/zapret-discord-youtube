@@ -11,7 +11,6 @@ OriginalFilename = "zapret_autorunner.exe"
 [dependencies]
 crossterm = "0.28.1"
 ctrlc = "3.4.1"
-winresource = "0.1.17"
 regex = "1.11.1"
 
 [build-dependencies]
