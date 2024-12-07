@@ -111,6 +111,7 @@ Following directories contain `Rust` code or utilities, packaged in build, all o
 * `select_domains` contains source code for util that helps you to select domains for DPI
 * `preconfig_tester` helps you to test pre-configs
 * `run_preconfig` helps to run pre-configs
+* `shared` contains useful function, used by other modules in project
 # Credits
 * [Zapret](https://github.com/bol-van/zapret)
 * [Zapret Win Bundle](https://github.com/bol-van/zapret-win-bundle)

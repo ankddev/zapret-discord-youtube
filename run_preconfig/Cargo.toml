@@ -10,6 +10,7 @@ OriginalFilename = "zapret_run_preconfig.exe"
 [dependencies]
 crossterm.workspace = true
 ctrlc = "3.4.1"
+shared = { path = "../shared" }
 
 [build-dependencies]
 winresource.workspace = true

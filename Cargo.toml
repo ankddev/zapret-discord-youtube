@@ -5,7 +5,7 @@ members = [
     "make_release",
     "preconfig_tester",
     "run_preconfig",
-    "select_domains",
+    "select_domains", "shared",
 ]
 
 [workspace.package]

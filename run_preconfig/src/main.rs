@@ -1,9 +1,8 @@
-mod terminal;
 mod ui;
 mod utils;
 
 use std::io::{self, stdout};
-use terminal::{cleanup_terminal, setup_terminal_cleanup};
+use shared::terminal::{self, cleanup_terminal, setup_terminal_cleanup};
 use ui::print_welcome_message;
 use utils::get_options;
 

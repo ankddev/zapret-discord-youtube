@@ -12,6 +12,7 @@ OriginalFilename = "zapret_autorunner.exe"
 crossterm.workspace = true
 ctrlc = "3.4.1"
 regex = "1.11.1"
+shared = { path = "../shared" }
 
 [build-dependencies]
 winresource.workspace = true

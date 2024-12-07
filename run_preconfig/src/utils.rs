@@ -1,4 +1,4 @@
-use std::{env, fs, io, process::Command};
+use std::{env, fs};
 
 pub fn get_options() -> Vec<String> {
     let current_dir = env::current_dir().expect("Failed to get current directory");

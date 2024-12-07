@@ -1,0 +1,8 @@
+[package]
+name = "shared"
+edition = "2021"
+version.workspace = true
+
+[dependencies]
+crossterm.workspace = true
+ctrlc = "3.4.1"
