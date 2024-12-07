@@ -268,7 +268,7 @@ impl ServiceManager {
                         stdout,
                         cursor::MoveTo(0, message_row as u16),
                         SetForegroundColor(Color::Yellow),
-                        Print("⚠ Permission denied доступе отказано, failed to install service.\n"),
+                        Print("⚠ Permission denied, failed to install service.\n"),
                         ResetColor
                     )?;
                 } else if output_code == 740 {

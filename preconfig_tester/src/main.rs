@@ -40,9 +40,7 @@ const DOMAIN_LIST: &[(&str, &str)] = &[
     ("0", "exit"),
 ];
 
-const ORANGE: Color = Color::Rgb(252, 197, 108);
 const GREEN: Color = Color::Rgb(126, 176, 0);
-const BLUE: Color = Color::Rgb(87, 170, 247);
 const MAGENTA: Color = Color::Rgb(196, 124, 186);
 const RED: Color = Color::Rgb(214, 77, 91);
 

@@ -112,35 +112,3 @@ pub fn run_powershell_command_with_output(command: &str) -> io::Result<String> {
         Err(io::Error::new(io::ErrorKind::Other, error_message))
     }
 }
-
-pub fn run_powershell_command(command: &str) -> io::Result<()> {
-    let output = Command::new("powershell")
-        .args(["-Command", command])
-        .output()
-        .map_err(|e| {
-            io::Error::new(
-                io::ErrorKind::Other,
-                format!("Failed to execute command: {}", e),
-            )
-        })?;
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        let error_message = String::from_utf8_lossy(&output.stderr).into_owned();
-
-        let error_message = if error_message.is_empty() {
-            String::from_utf8_lossy(&output.stdout).into_owned()
-        } else {
-            error_message
-        };
-
-        let error_message = if error_message.is_empty() {
-            "Unknown error occured while executing PowerShell command".to_string()
-        } else {
-            error_message
-        };
-
-        Err(io::Error::new(io::ErrorKind::Other, error_message))
-    }
-}

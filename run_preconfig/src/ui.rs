@@ -28,9 +28,7 @@ pub fn print_welcome_message() -> usize {
     current_line += 1;
     println!("===");
     current_line += 2;
-    println!(
-        "Using ARROWS on your keyboard, select BAT file from list for running it.\n"
-    );
+    println!("Using ARROWS on your keyboard, select BAT file from list for running it.\n");
     println!("For selection press ENTER.");
     current_line += 2;
     current_line
@@ -181,12 +179,15 @@ pub fn handle_selection(
     let current_dir = std::env::current_dir()?;
     let sub_dir = current_dir.join("pre-configs");
     let bat_file_path = sub_dir.join(selected_file);
-    let output = Command::new(bat_file_path).output().map_err(|e| {
-        io::Error::new(
-            io::ErrorKind::Other,
-            format!("Failed to execute command: {}", e),
-        )
-    }).expect("Failed to execute command");
+    let output = Command::new(bat_file_path)
+        .output()
+        .map_err(|e| {
+            io::Error::new(
+                io::ErrorKind::Other,
+                format!("Failed to execute command: {}", e),
+            )
+        })
+        .expect("Failed to execute command");
     return if output.status.success() {
         Ok(())
     } else {
@@ -206,8 +207,6 @@ pub fn handle_selection(
 
         Err(io::Error::new(io::ErrorKind::Other, error_message))
     };
-
-    Ok(())
 }
 
 pub fn run_main_loop(

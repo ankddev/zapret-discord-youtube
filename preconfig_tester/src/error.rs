@@ -2,6 +2,7 @@ use std::error::Error;
 use std::fmt;
 use std::io; // Import the native_tls crate
 
+#[allow(unused)]
 #[derive(Debug)]
 pub enum AppError {
     IoError(String),

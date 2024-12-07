@@ -2,7 +2,7 @@ use crossterm::{
     cursor, execute,
     terminal::{self, Clear, ClearType},
 };
-use std::io::{self, stdout, Write};
+use std::io::{self, Write};
 
 pub fn init(stdout: &mut impl Write) -> io::Result<()> {
     terminal::enable_raw_mode()?;
@@ -21,7 +21,7 @@ pub fn get_size() -> io::Result<(u16, u16)> {
 }
 
 pub fn cleanup_terminal() -> io::Result<()> {
-    let mut stdout = stdout();
+    let mut stdout = std::io::stdout();
     terminal::disable_raw_mode()?;
     execute!(
         stdout,
@@ -47,8 +47,9 @@ pub fn setup_terminal_cleanup() {
     .expect("Error setting Ctrl-C handler");
 }
 
-pub fn cleanup_and_exit(stdout: &mut impl Write) -> io::Result<()> {
-    println!("\nReady!\nYou can close this window");
+pub fn cleanup_and_exit(mut stdout: &mut impl Write) -> io::Result<()> {
+    writeln!(&mut stdout, "\nReady!\nYou can close this window")
+        .expect("Failed to print line to stdout");
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
     Ok(())

@@ -80,8 +80,4 @@ impl ProcessManager {
             sleep(Duration::from_millis(200)); // Wait a bit before checking again
         }
     }
-
-    fn kill_process_by_name(&mut self, process_name: &str) {
-        self.ensure_process_terminated(process_name);
-    }
 }

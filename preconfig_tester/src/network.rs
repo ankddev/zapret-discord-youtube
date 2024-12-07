@@ -1,26 +1,14 @@
 use crate::error::AppResult;
 use std::time::Duration;
-use ureq::{Agent, AgentBuilder, Error as UreqError, ErrorKind as UreqErrorKind, Transport};
+use ureq::{AgentBuilder, Error as UreqError, ErrorKind as UreqErrorKind, Transport};
 
 pub struct NetworkChecker {
-    agent: Agent,
     timeout: Duration,
 }
 
 impl NetworkChecker {
     pub fn new(timeout: Duration) -> Self {
-        let agent = AgentBuilder::new()
-            .timeout_read(timeout)
-            .timeout_write(timeout)
-            // Chrome 122 on Windows 10 User-Agent
-            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
-            // Enable TLS session resumption
-            .try_proxy_from_env(false)
-            // Enable automatic redirect following (like browsers do)
-            .redirects(4)
-            .build();
-
-        Self { agent, timeout }
+        Self { timeout }
     }
 
     pub fn test_connection(&self, target: &str) -> AppResult<bool> {
@@ -205,7 +193,7 @@ enum ConnectionResult {
     NoConnection,
     ISPBlock,
 }
-
+#[allow(unused)]
 #[derive(Debug, PartialEq)]
 pub enum DPITestResult {
     NoDPI,
