@@ -21,7 +21,7 @@ You can download this build from [releases](https://github.com/ankddev/zapret-di
 * Enjoy it!
 
 > [!TIP]
-> Also you can run file `Run pre-config.exe` and select pre-config to run it
+> Also you can run file `Run pre-config.exe` and select pre-config to run
 
 ## Add to autorun
 To add fix to autorun, start `Add to autorun.exe` and select on of presented BAT files. To delete from autorun, start this file and select `Delete service from autorun` option.
