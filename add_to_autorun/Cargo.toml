@@ -14,5 +14,4 @@ ctrlc = "3.4.1"
 regex = "1.11.1"
 
 [build-dependencies]
-# Used for embedding resources in the executable
-winresource = "0.1.18"
+winresource.workspace = true

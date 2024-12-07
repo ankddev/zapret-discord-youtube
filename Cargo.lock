@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "add_to_autorun"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
  "crossterm",
  "ctrlc",
@@ -666,7 +666,7 @@ dependencies = [
 
 [[package]]
 name = "make_release"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
  "anyhow",
  "dunce",
@@ -867,7 +867,7 @@ dependencies = [
 
 [[package]]
 name = "preconfig_tester"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
  "native-tls",
  "sysinfo",
@@ -1000,7 +1000,7 @@ dependencies = [
 
 [[package]]
 name = "run_preconfig"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
  "crossterm",
  "ctrlc",
@@ -1107,7 +1107,7 @@ dependencies = [
 
 [[package]]
 name = "select_domains"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
  "crossterm",
  "winresource",

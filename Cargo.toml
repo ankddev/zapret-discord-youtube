@@ -1,8 +1,16 @@
 [workspace]
 resolver = "2"
 members = [
-    "add_to_autorun", "make_release", "preconfig_tester", "run_preconfig", "select_domains",
+    "add_to_autorun",
+    "make_release",
+    "preconfig_tester",
+    "run_preconfig",
+    "select_domains",
 ]
 
 [workspace.package]
 version = "1.1.0"
+
+[workspace.dependencies]
+# Used for embedding resources in the executable
+winresource = "0.1.18"

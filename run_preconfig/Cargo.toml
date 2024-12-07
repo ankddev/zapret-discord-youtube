@@ -12,5 +12,4 @@ crossterm = "0.28.1"
 ctrlc = "3.4.1"
 
 [build-dependencies]
-# Used for embedding resources in the executable
-winresource = "0.1.18"
+winresource.workspace = true
