@@ -9,7 +9,7 @@ LegalCopyright = "2024 by ANKDDEV"
 OriginalFilename = "zapret_autorunner.exe"
 
 [dependencies]
-crossterm = "0.28.1"
+crossterm.workspace = true
 ctrlc = "3.4.1"
 regex = "1.11.1"
 

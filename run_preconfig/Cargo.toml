@@ -8,7 +8,7 @@ LegalCopyright = "2024 by ANKDDEV"
 OriginalFilename = "zapret_run_preconfig.exe"
 
 [dependencies]
-crossterm = "0.28.1"
+crossterm.workspace = true
 ctrlc = "3.4.1"
 
 [build-dependencies]

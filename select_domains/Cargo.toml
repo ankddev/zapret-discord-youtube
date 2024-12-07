@@ -9,7 +9,7 @@ LegalCopyright = "2024 by ANKDDEV"
 OriginalFilename = "zapret_select_domains.exe"
 
 [dependencies]
-crossterm = "0.28.1"
+crossterm.workspace = true
 
 [build-dependencies]
 winresource.workspace = true

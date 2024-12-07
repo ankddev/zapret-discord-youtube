@@ -14,3 +14,5 @@ version = "1.1.0"
 [workspace.dependencies]
 # Used for embedding resources in the executable
 winresource = "0.1.18"
+# Used for tui
+crossterm = "0.28.1"
