@@ -4,6 +4,8 @@ use crossterm::{
 };
 use std::io::{self, Write};
 
+
+/// Go to alternate screen, hide cursor and clear screen
 pub fn init(stdout: &mut impl Write) -> io::Result<()> {
     terminal::enable_raw_mode()?;
     execute!(
@@ -16,10 +18,13 @@ pub fn init(stdout: &mut impl Write) -> io::Result<()> {
     Ok(())
 }
 
+
+/// Get size of current terminal window
 pub fn get_size() -> io::Result<(u16, u16)> {
     terminal::size()
 }
 
+/// Clean terminal screen
 pub fn cleanup_terminal() -> io::Result<()> {
     let mut stdout = std::io::stdout();
     terminal::disable_raw_mode()?;
@@ -33,6 +38,7 @@ pub fn cleanup_terminal() -> io::Result<()> {
     Ok(())
 }
 
+/// Setup clearing terminal screen on Ctrl-C
 pub fn setup_terminal_cleanup() {
     let original_hook = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |panic_info| {
@@ -47,6 +53,7 @@ pub fn setup_terminal_cleanup() {
     .expect("Error setting Ctrl-C handler");
 }
 
+/// Clean screen and exit
 pub fn cleanup_and_exit(mut stdout: &mut impl Write) -> io::Result<()> {
     writeln!(&mut stdout, "\nReady!\nYou can close this window")
         .expect("Failed to print line to stdout");
