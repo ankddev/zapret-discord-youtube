@@ -27,7 +27,7 @@ You can download this build from [releases](https://github.com/ankddev/zapret-di
 To add fix to autorun, start `Add to autorun.exe` and select on of presented BAT files. To delete from autorun, start this file and select `Delete service from autorun` option.
 
 ## Setup for other sites
-You can add your own domains to `list-ultimate.txt` or you can use special utility for this. Start file `Set domain list.exe` and select all options you want, then select `Save list` and press ENTER.
+You can add your own domains to `list-ultimate.txt` or you can use special utility for this. Start file `Set domain list.exe` and select all options you want, then select `Save list` and press <kbd>ENTER</kbd>.
 
 List `russia-blacklist.txt` contains all [known blocked](https://antizapret.prostovpn.org/domains-export.txt) sites in Russia.
 
