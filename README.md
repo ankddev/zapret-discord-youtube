@@ -5,6 +5,7 @@
   <a href="https://github.com/ankddev/zapret-discord-youtube/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/ankddev/zapret-discord-youtube"></a>
   <a href="https://github.com/ankddev/zapret-discord-youtube"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ankddev/zapret-discord-youtube?style=flat"></a>
 </div>
+
 [README на русском языке](./README.RU.md)
 
 This build includes files from [original repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord or other services in Russia and some useful utilities, written in Rust.
