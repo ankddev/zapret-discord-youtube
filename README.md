@@ -25,7 +25,7 @@ You can download this build from [releases](https://github.com/ankddev/zapret-di
 > Also you can run file `Run pre-config.exe` and select pre-config to run
 
 ## Add to autorun
-To add fix to autorun, start `Add to autorun.exe` and select on of presented BAT files. To delete from autorun, start this file and select `Delete service from autorun` option.
+To add fix to autorun, start `Add to autorun.exe` and select one of presented BAT files. To delete from autorun, start this file and select `Delete service from autorun` option.
 
 ## Setup for other sites
 You can add your own domains to `list-ultimate.txt` or you can use special utility for this. Start file `Set domain list.exe` and select all options you want, then select `Save list` and press <kbd>ENTER</kbd>.
@@ -49,7 +49,7 @@ Firstly, check **all** pre-configs or run `Automatically search pre-config.exe`.
 * Find `* SUMMARY` line in the end
 * There you will find arguments to winws, for example `winws --wf-l3=ipv4 --wf-tcp=80 --dpi-desync=split2 --dpi-desync-split-http-req=host`
 * Also working strategies marked with `!!!!! AVAILABLE !!!!!`
-* Crete file `custom.bat` (or anything else) and fill it using other pre-configs as example
+* Create file `custom.bat` (or anything else) and fill it using other pre-configs as example
 * Run `custom.bat`
 
 ## File winws.exe not found
@@ -102,12 +102,12 @@ cargo fmt
 To build this run `cargo build --release`. Then go to `target/release` folder and run `make_release.exe` to make ZIP archive with all files.
 ## Structure of project
 This project is separated in few folders:
-* `bin` contains pre-built binaries from original project
+* `bin` contains pre-built binaries from original repository
 * `pre-configs` contains pre-configs (BAT files)
 * `lists` contains lists of domains to work with
 * `resources` contains `README.txt` and `blockcheck.cmd` files
 Following directories contain `Rust` code or utilities, packaged in build, all of them united to `cargo workspace` so you should run all Cargo commands from root directory of project:
-* `make_release` contains source code for make-release util  which isn't pacakged with build. It helps to create archive with build of projects. Currentlyx you must open it from target directory, so if you running it from terminal tou should firstly go to `target/release` or `target/debug` directories
+* `make_release` contains source code for make-release util, which isn't pacakged with build. It helps to create archive with build of projects. Currentlyx you must open it from target directory, so if you running it from terminal tou should firstly go to `target/release` or `target/debug` directories
 * `add_to_autorun` contains code for utility that helps you to add fix to autorun
 * `select_domains` contains source code for util that helps you to select domains for DPI
 * `preconfig_tester` helps you to test pre-configs
