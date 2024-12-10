@@ -35,7 +35,7 @@
 Чтобы не париться вручную и случайно не ошибиться.
 Для сборки была специально разработана небольшая утилита.
 
-Она называется "Add domains.exe".
+Она называется "Set domain list.exe".
 
 Запустите её, и выберите из списка все нужные домена.
 Например, youtube, discord и twitch.
@@ -46,7 +46,7 @@
 Всё, фикс на новых доменах должен работать!
 
 Учтите, что работа выбранного домена с выбранным пре-конфигом не гарантирована.
-Воспользуйтесь утилитой "АВТО-ПОИСК пре-конфига.exe", чтобы подобрать нужный конфиг для нужного домена.
+Воспользуйтесь утилитой "Automatically search pre-config.exe", чтобы подобрать нужный конфиг для нужного домена.
 
 При необходимости, объедините разные стратегии пре-конфигов в 1 универсальный батник.
 Как это сделать можно узнать из секции, описывающей работу утилиты Blockcheck.
@@ -55,7 +55,7 @@
 
 ### ЕСЛИ НИ ОДИН ПРЕ_КОНФИГ НЕ ЗАРАБОТАЛ ###
 Убедитесь, что вы проверили ВСЕ батники из папки pre-configs.
-Чтобы не пробовать все вручную, в сборку встроена утилита "Auto-search pre-config.exe" (он сам найдет нужный пре-конфиг).
+Чтобы не пробовать все вручную, в сборку встроена утилита "Automatically search pre-config.exe" (он сам найдет нужный пре-конфиг).
 Если даже это не помогло, то воспользуйтесь утилитой BLOCKCHECK.
 
 В корне сборки лежит файлик blockcheck.cmd.
@@ -116,7 +116,7 @@
     Либо вставляйте эти параметры в готовые пре-конфиги
 
     Можете даже насоздавать хоть 200 таких батников
-    А потом всех их разом проверить утилитой "АВТО-ПОИСК пре-конфига.exe
+    А потом всех их разом проверить утилитой "Automatically search pre-config.exe
 
     Также почитай доп. инструкцию о том, как работать с блокчек от автора Zapret
     по ссылке - https://github.com/bol-van/zapret/blob/master/docs/quick_start_windows.txt
@@ -133,20 +133,6 @@
 Если вкратце, это НЕ вирус.
 Некоторые антивирусы ругаются, так как драйвер WinDivert манипулирует пакетами.
 Без этого никак, тк в этом и заключается смысл данного фикса - он искажает сетевые DPI пакеты.
-
-Для особых параноиков, вот ссылки на оригинальные GitHub репозитории всего, из чего собрана данная сборка:
-GitHub Zapret - https://github.com/bol-van/zapret
-GitHub Zapret Win Bundle - https://github.com/bol-van/zapret-win-bundle
-GitHub WinDivert - https://github.com/basil00/WinDivert
-GitHub Zapret Autorunner - https://github.com/Priler/bat_autorunner
-GitHub Zapret Preconfigs Tester - https://github.com/Priler/zapret_preconfigs_tester
-GitHub Zapret Domains Selector - https://github.com/Priler/zapret_domains_selector
-GitHub Zapret Discord - https://github.com/Flowseal/zapret-discord-youtube
-Zapret Discord YouTube Fix - https://howdyho.net/windows-software/discord-fix-snova-rabotayushij-diskord-vojs-zvonk
-
-Остаются только .BAT файлы.
-Можете их открыть через Блокнот и посмотреть что внутри.
-На этом всё, в сборке больше ничего нет.
 
 ### ЕСЛИ НЕ РАБОТАЕТ ###
 - Попробуйте в браузере ВКЛЮЧИТЬ протоколы QUIC и Kyber (делается в chrome://flags или в about:config для фаерфокса).
