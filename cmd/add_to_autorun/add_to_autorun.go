@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -138,7 +137,7 @@ func getOptions() []string {
 		return options
 	}
 
-	files, err := ioutil.ReadDir(filepath.Join(currentDir, "pre-configs"))
+	files, err := os.ReadDir(filepath.Join(currentDir, "pre-configs"))
 	if err != nil {
 		return options
 	}
