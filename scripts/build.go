@@ -9,7 +9,9 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/cli/safeexec"
 )
 
@@ -18,7 +20,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Building...")
+	fmt.Println("[1/4] Building...")
 	ldflags := os.Getenv("GO_LDFLAGS")
 	ldflags = fmt.Sprintf("-X main.version=%s %s", version(), ldflags)
 	_ = os.Mkdir("build", os.ModePerm)
@@ -78,7 +80,11 @@ func main() {
 		"bin":         binDir,
 	}
 
-	fmt.Println("[1/3] Adding directories...")
+	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
+	s.Suffix = " [2/4] Adding directories..."
+	s.FinalMSG = "[2/4] Adding directories...\n"
+	s.HideCursor = true
+	s.Start()
 	for zipPath, fsPath := range dirsToAdd {
 		err = addDirToZip(zipWriter, zipPath, fsPath)
 		if err != nil {
@@ -86,9 +92,13 @@ func main() {
 			os.Exit(1)
 		}
 	}
+	s.Stop()
 
 	// Add individual files
-	fmt.Println("[2/3] Adding files...")
+	s.Suffix = " [3/4] Adding files..."
+	s.FinalMSG = "[3/4] Adding files...\n"
+	s.HideCursor = true
+	s.Start()
 	filesToAdd := map[string]string{
 		"___README.TXT":                       filepath.Join(resourcesDir, "___README.TXT"),
 		"blockcheck.cmd":                      filepath.Join(resourcesDir, "blockcheck.cmd"),
@@ -106,7 +116,9 @@ func main() {
 		}
 	}
 
-	fmt.Println("[3/3] Release archive created successfully!")
+	s.Stop()
+
+	fmt.Println("[4/4] Release archive created successfully!")
 	fmt.Printf("\nRelease build ready! Check '%s'\n", zipPath)
 	fmt.Println("Press Enter to continue...")
 	fmt.Scanln()
