@@ -59,7 +59,7 @@ func (sm *ServiceManager) runPowershellCommand(command string) (string, error) {
 }
 
 func (sm *ServiceManager) removeService() error {
-	fmt.Println("\n=== Deleting existing service ===\n")
+	fmt.Println("=== Deleting existing service ===")
 
 	// Stop service
 	fmt.Printf("► Stopping service '%s'...\n", sm.serviceName)
@@ -98,7 +98,7 @@ func (sm *ServiceManager) installService(batFilePath string) error {
 		return err
 	}
 
-	fmt.Println("\n=== Installing new service ===\n")
+	fmt.Println("=== Installing new service ===")
 	fmt.Printf("► Installing file as service: %s\n", batFilePath)
 
 	// Create service
@@ -319,7 +319,7 @@ func main() {
 				serviceManager.installService(batPath)
 			}
 
-			fmt.Println("\nReady! You can close this window")
+			fmt.Println("Ready! You can close this window")
 			bufio.NewReader(os.Stdin).ReadBytes('\n')
 			return
 		case keyboard.KeyEsc:
