@@ -6,7 +6,7 @@
   <a href="https://github.com/ankddev/zapret-discord-youtube"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ankddev/zapret-discord-youtube?style=flat"></a>
 </div>
 
-Эта сбока включает в себя файлы из [оригинального репозитория](https://github.com/bol-van/zapret-win-bundle), кастомные прре-конфиги для исправления работы YouTube, Discord oили других сервисов в России и некоторые полезные утилиты, написанные на Rust.
+Эта сбока включает в себя файлы из [оригинального репозитория](https://github.com/bol-van/zapret-win-bundle), кастомные прре-конфиги для исправления работы YouTube, Discord oили других сервисов в России и некоторые полезные утилиты, написанные на Go.
 # Настройка
 ## Скачать
 Вы можете загрузить эту сборку из [релизов](https://github.com/ankddev/zapret-discord-youtube/releases) или [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
@@ -92,26 +92,28 @@ Check [this](https://github.com/bol-van/zapret/blob/master/docs/quick_start.txt)
 * Внесите изменения
 * Запустите линтер и отформатируйте код:
 ```bash
-cargo clippy --fix
-cargo fmt
+go fmt .\...
 ```
 * Создайте PR
 
 ## Сборка
-Чтобы собрать этот проект, запустите `cargo build --release`. Дальше, перейдите в папку `target/release` и запустите файл `make_release.exe`, чтобы сделать ZIP архив со всеми файлами.
+Чтобы собрать этот проект, запустите:
+```bash
+scripts\build.bat
+```
+Это скомпилиррует все бинарные файлы и создаст zip архив в папке `build`.
 ## Структура проекта
 Этот проект разделён на нескольео папок:
 * `bin` содержит готовые бинарники из оригинального репозитория
 * `pre-configs` содержит пре-конфиги (батники)
 * `lists` содержит списки доменов
 * `resources` содержит файлы `README.txt` и `blockcheck.cmd`
-Следующие папки содержат код на `Rust` или утилиты, содержащиеся в фиксе, все они объединены в `cargo workspace` поэтому вам следует запускать все команды Cargo из корневой директории проекта:
-* `make_release` содержит код для утилиты make-release, которая не включена в итоговый архив. Она помогает создать архив со сборкой фикса. Сейчас вы должны запускать его из директории сборки, поэтому, если вы запускаете её из терминала, вы должны перейти в директории `target/release` или `target/debug`
-* `add_to_autorun` включает код для утилиты, котроая позволяет добавить фикс в автозапуск
-* `select_domains` включает код для утилиты, которая позволяет выбрать домены для DPI
-* `preconfig_tester` помогает тестировать пре-конфиги
-* `run_preconfig`помогает запускать пре-конфиги
-* `shared` включает некоторые полезные функции, используемые другими модулями
+* `scripts` содержит скрипты для сборки проекта
+* `cmd` содержит исходный код для утилит
+  * `add_to_autorun` содержит код для утилиты, которая помогает добавить фикс в автозапуск
+  * `select_domains` содержит код для утилиты, которая помогает выбрать домены для DPI
+  * `preconfig_tester` помогает тестировать пре-конфиги
+  * `run_preconfig` помогает запускать пре-конфиги
 # Кредиты
 * [Zapret](https://github.com/bol-van/zapret)
 * [Zapret Win Bundle](https://github.com/bol-van/zapret-win-bundle)
