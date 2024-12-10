@@ -39,12 +39,10 @@ func main() {
 
 	// Define paths
 	buildDir := filepath.Join(currentDir, "build")
-	// projectDir := filepath.Dir(currentDir)
-	projectDir := currentDir
-	binDir := filepath.Join(projectDir, "bin")
-	listsDir := filepath.Join(projectDir, "lists")
-	preConfigsDir := filepath.Join(projectDir, "pre-configs")
-	resourcesDir := filepath.Join(projectDir, "resources")
+	binDir := filepath.Join(currentDir, "bin")
+	listsDir := filepath.Join(currentDir, "lists")
+	preConfigsDir := filepath.Join(currentDir, "pre-configs")
+	resourcesDir := filepath.Join(currentDir, "resources")
 
 	// Check required paths exist
 	requiredPaths := []string{
