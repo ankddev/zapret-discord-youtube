@@ -42,14 +42,12 @@ func main() {
 	binDir := filepath.Join(currentDir, "bin")
 	listsDir := filepath.Join(currentDir, "lists")
 	preConfigsDir := filepath.Join(currentDir, "pre-configs")
-	resourcesDir := filepath.Join(currentDir, "resources")
 
 	// Check required paths exist
 	requiredPaths := []string{
 		buildDir,
 		listsDir,
 		preConfigsDir,
-		resourcesDir,
 	}
 
 	for _, path := range requiredPaths {
@@ -98,7 +96,7 @@ func main() {
 	s.HideCursor = true
 	s.Start()
 	filesToAdd := map[string]string{
-		"blockcheck.cmd":                      filepath.Join(resourcesDir, "blockcheck.cmd"),
+		"blockcheck.cmd":                      filepath.Join(currentDir, "blockcheck.cmd"),
 		"Add to autorun.exe":                  filepath.Join(buildDir, "add_to_autorun.exe"),
 		"Automatically search pre-config.exe": filepath.Join(buildDir, "preconfig_tester.exe"),
 		"Run pre-config.exe":                  filepath.Join(buildDir, "run_preconfig.exe"),
