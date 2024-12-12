@@ -68,7 +68,7 @@ func printWelcomeMessage(buf *bytes.Buffer) int {
 		"Author: ANKDDEV https://github.com/ankddev",
 		fmt.Sprintf("Version: %s", version),
 		"===",
-		"\nUsing ARROWS on your keyboard, select BAT file from list for running.\n",
+		"\nUsing ARROWS on your keyboard, select BAT file from list for running or select 'Run BLOCKCHECK (Auto-setting BAT parameters)' or select 'Exit'.\n",
 		"For selection press ENTER.",
 	}
 
@@ -82,6 +82,7 @@ var version string
 
 func getOptions() []string {
 	options := []string{
+		"Exit",
 		"Run BLOCKCHECK (Auto-setting BAT parameters)",
 	}
 
@@ -260,6 +261,8 @@ func handleSelection(selected string) error {
 		if err != nil {
 			return fmt.Errorf("%s⚠ Error running BLOCKCHECK: %v%s", colorRed, err, colorReset)
 		}
+		return nil
+	case "Exit":
 		return nil
 	default:
 		fmt.Print(showCursor + exitAltScreen)
