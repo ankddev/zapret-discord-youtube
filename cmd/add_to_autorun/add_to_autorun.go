@@ -129,6 +129,7 @@ func (sm *ServiceManager) installService(batFilePath string) error {
 
 func getOptions() []string {
 	options := []string{
+		"Exit",
 		"Delete service from autorun",
 		"Run BLOCKCHECK (Auto-setting BAT parameters)",
 	}
@@ -167,7 +168,7 @@ func printWelcomeMessage(buf *bytes.Buffer) {
 		"Author: ANKDDEV https://github.com/ankddev",
 		fmt.Sprintf("Version: %s", version),
 		"===",
-		"\nUsing ARROWS on your keyboard, select BAT file from list for installing service 'discordfix_zapret' or select 'Delete service from autorun' or 'Run BLOCKCHECK (Auto-setting BAT parameters)'.\n",
+		"\nUsing ARROWS on your keyboard, select BAT file from list for installing service 'discordfix_zapret' or select 'Delete service from autorun' or 'Run BLOCKCHECK (Auto-setting BAT parameters)' or select 'Exit'.\n",
 		"For selection press ENTER.",
 	}
 
@@ -313,6 +314,8 @@ func main() {
 					if err != nil {
 						fmt.Printf("%s⚠ Error running BLOCKCHECK: %v%s\n", colorRed, err, colorReset)
 					}
+					return
+				case "Exit":
 					return
 				default:
 					batPath := filepath.Join("pre-configs", options[currentSelection])
