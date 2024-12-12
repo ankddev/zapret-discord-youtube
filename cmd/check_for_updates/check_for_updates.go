@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+	"time"
 
 	"golang.org/x/mod/semver"
 )
@@ -33,6 +35,10 @@ const (
 	githubAPI    = "https://api.github.com/repos/ankddev/zapret-discord-youtube"
 	versionFile  = "https://raw.githubusercontent.com/ankddev/zapret-discord-youtube/main/.service/version.txt"
 	releaseAsset = "zapret-discord-youtube-ankddev.zip"
+
+	fps        = 240
+	frameTime  = time.Second / time.Duration(fps)
+	bufferSize = 4096
 )
 
 // Version is set during build
@@ -137,7 +143,18 @@ func downloadRelease(url, destPath string) error {
 
 func main() {
 	// Initialize terminal
-	fmt.Print(clearScreen)
+	var buf bytes.Buffer
+	buf.Grow(bufferSize)
+
+	// Create output buffer for direct writes
+	output := bufio.NewWriter(os.Stdout)
+	defer output.Flush()
+
+	// Use single write operations
+	buf.WriteString("\033[H\033[J")
+	output.Write(buf.Bytes())
+	output.Flush()
+
 	fmt.Print(enterAltScreen + hideCursor)
 	defer fmt.Print(showCursor + exitAltScreen)
 

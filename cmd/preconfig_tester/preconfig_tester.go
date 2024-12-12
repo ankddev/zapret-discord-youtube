@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -23,6 +24,10 @@ const (
 	hideCursor     = "\033[?25l"
 	showCursor     = "\033[?25h"
 	clearScreen    = "\033[2J\033[H"
+
+	fps        = 240
+	frameTime  = time.Second / time.Duration(fps)
+	bufferSize = 4096
 )
 
 var domainList = []struct {
@@ -324,11 +329,19 @@ func runBypassCheck(config Config) error {
 }
 
 func main() {
-	// Terminal initialization
+	var buf bytes.Buffer
+	buf.Grow(bufferSize)
+
+	// Create output buffer for direct writes
+	output := bufio.NewWriter(os.Stdout)
+	defer output.Flush()
+
+	// Initialize terminal
+	buf.WriteString("\033[H\033[J")
+	output.Write(buf.Bytes())
+	output.Flush()
+
 	fmt.Print(enterAltScreen + hideCursor)
-	// Clear screen before switching
-	fmt.Print(clearScreen)
-	// Restore normal terminal state on exit
 	defer fmt.Print(showCursor + exitAltScreen)
 
 	// Check for administrator privileges
@@ -357,6 +370,12 @@ func main() {
 		processWaitTime:   10 * time.Second,
 		connectionTimeout: 5 * time.Second,
 	}
+
+	// Use buffered output for all writes
+	buf.Reset()
+	buf.WriteString(fmt.Sprintf("\nStarting testing domain: %s\n", config.targetDomain))
+	output.Write(buf.Bytes())
+	output.Flush()
 
 	if err := runBypassCheck(config); err != nil {
 		fmt.Printf("Error: %v\n", err)

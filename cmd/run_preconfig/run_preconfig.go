@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/eiannone/keyboard"
 )
@@ -26,6 +28,9 @@ const (
 	colorGreen          = "\033[32m"
 	colorCyan           = "\033[36m"
 	colorGrey           = "\033[90m"
+	fps                 = 240
+	frameTime           = time.Second / time.Duration(fps)
+	bufferSize          = 4096
 )
 
 func setupTerminalCleanup() {
@@ -59,11 +64,11 @@ func getTerminalSize() (int, int) {
 func printWelcomeMessage(buf *bytes.Buffer) int {
 	messages := []string{
 		"Welcome!",
-		"This program can install BAT file as service with autorun.",
+		"This program can run any pre-config BAT file.",
 		"Author: ANKDDEV https://github.com/ankddev",
 		fmt.Sprintf("Version: %s", version),
 		"===",
-		"\nUsing ARROWS on your keyboard, select BAT file from list for installing service 'discordfix_zapret' or select 'Delete service from autorun' or 'Run BLOCKCHECK (Auto-setting BAT parameters)'.\n",
+		"\nUsing ARROWS on your keyboard, select BAT file from list for running.\n",
 		"For selection press ENTER.",
 	}
 
@@ -142,6 +147,13 @@ func main() {
 }
 
 func runMainLoop(buf *bytes.Buffer, options []string, startRow, termHeight int) error {
+	// Pre-allocate buffer
+	buf.Grow(bufferSize)
+
+	// Create output buffer for direct writes
+	output := bufio.NewWriter(os.Stdout)
+	defer output.Flush()
+
 	currentSelection := 0
 	scrollOffset := 0
 	maxVisibleOptions := min(15, termHeight-startRow-3)
@@ -152,60 +164,81 @@ func runMainLoop(buf *bytes.Buffer, options []string, startRow, termHeight int) 
 	defer keyboard.Close()
 
 	for {
+		start := time.Now()
+
 		buf.Reset()
 		buf.WriteString("\033[H\033[J")
 
-		// Always print welcome message
 		printWelcomeMessage(buf)
 
-		// Show up arrow if there are hidden elements
+		// Show scroll indicators
 		if scrollOffset > 0 {
 			buf.WriteString(fmt.Sprintf("%s↑ more items above%s\n", colorGrey, colorReset))
 		}
 
-		// Show visible options
+		// Calculate visible range
 		endIdx := min(scrollOffset+maxVisibleOptions, len(options))
+
+		// Update scroll position
+		if currentSelection >= scrollOffset+maxVisibleOptions-1 {
+			scrollOffset = currentSelection - maxVisibleOptions + 2
+		} else if currentSelection < scrollOffset {
+			scrollOffset = currentSelection
+		}
+
+		// Ensure scroll bounds
+		if scrollOffset < 0 {
+			scrollOffset = 0
+		}
+		if scrollOffset > len(options)-maxVisibleOptions {
+			scrollOffset = max(0, len(options)-maxVisibleOptions)
+		}
+
+		// Batch write visible options
 		for i := scrollOffset; i < endIdx; i++ {
-			prefix := "  "
 			if i == currentSelection {
-				prefix = "► "
-				buf.WriteString(fmt.Sprintf("%s%s%s%s\n", colorCyan, prefix, options[i], colorReset))
+				buf.WriteString(fmt.Sprintf("%s► %s%s\n", colorCyan, options[i], colorReset))
 			} else {
-				buf.WriteString(fmt.Sprintf("%s%s\n", prefix, options[i]))
+				buf.WriteString(fmt.Sprintf("  %s\n", options[i]))
 			}
 		}
 
-		// Show down arrow if there are hidden elements
 		if endIdx < len(options) {
 			buf.WriteString(fmt.Sprintf("%s↓ more items below%s\n", colorGrey, colorReset))
 		}
 
-		os.Stdout.Write(buf.Bytes())
+		// Single write operation
+		output.Write(buf.Bytes())
+		output.Flush()
 
-		_, key, err := keyboard.GetKey()
-		if err != nil {
-			return fmt.Errorf("error reading keyboard: %v", err)
+		// Precise frame timing
+		elapsed := time.Since(start)
+		if elapsed < frameTime {
+			time.Sleep(frameTime - elapsed)
 		}
 
-		switch key {
-		case keyboard.KeyArrowUp:
-			if currentSelection > 0 {
-				currentSelection--
-				if currentSelection < scrollOffset {
-					scrollOffset = currentSelection
+		// Non-blocking keyboard input
+		if _, key, err := keyboard.GetKey(); err == nil {
+			switch key {
+			case keyboard.KeyArrowUp:
+				if currentSelection > 0 {
+					currentSelection--
+					if currentSelection < scrollOffset {
+						scrollOffset = currentSelection
+					}
 				}
-			}
-		case keyboard.KeyArrowDown:
-			if currentSelection < len(options)-1 {
-				currentSelection++
-				if currentSelection >= scrollOffset+maxVisibleOptions {
-					scrollOffset = currentSelection - maxVisibleOptions + 1
+			case keyboard.KeyArrowDown:
+				if currentSelection < len(options)-1 {
+					currentSelection++
+					if currentSelection >= scrollOffset+maxVisibleOptions {
+						scrollOffset = currentSelection - maxVisibleOptions + 1
+					}
 				}
+			case keyboard.KeyEnter:
+				return handleSelection(options[currentSelection])
+			case keyboard.KeyEsc:
+				return nil
 			}
-		case keyboard.KeyEnter:
-			return handleSelection(options[currentSelection])
-		case keyboard.KeyEsc:
-			return nil
 		}
 	}
 }
@@ -257,4 +290,11 @@ func runPowershellCommand(command string) (string, error) {
 		return "", fmt.Errorf("PowerShell error: %v - %s", err, string(output))
 	}
 	return string(output), nil
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

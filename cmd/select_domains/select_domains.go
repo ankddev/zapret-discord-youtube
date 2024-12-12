@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -32,6 +33,9 @@ const (
 	visibleItems     = 15
 	headerLines      = 5
 	scrollAreaHeight = visibleItems + 2
+	fps              = 240
+	frameTime        = time.Second / time.Duration(fps)
+	bufferSize       = 4096
 )
 
 type FileEntry struct {
@@ -51,11 +55,9 @@ func setupTerminalCleanup() {
 	}()
 }
 
-func drawScreen(buf *bytes.Buffer, entries []FileEntry, currentIndex, scrollOffset int, clearScreen bool) {
-	if clearScreen {
-		buf.WriteString("\033[2J")
-	}
-	buf.WriteString("\033[H")
+func drawScreen(buf *bytes.Buffer, entries []FileEntry, currentIndex, scrollOffset int, output *bufio.Writer) {
+	buf.Reset()
+	buf.WriteString("\033[H\033[J")
 
 	// Header section
 	buf.WriteString("Use ↑↓ (arrows) for navigation, SPACE or ↵ (ENTER) to select\n\n")
@@ -133,6 +135,10 @@ func drawScreen(buf *bytes.Buffer, entries []FileEntry, currentIndex, scrollOffs
 	if visibleEnd < totalFiles {
 		buf.WriteString(fmt.Sprintf("%s↓ Scroll down for more files%s\n", colorGrey, colorReset))
 	}
+
+	// Single write operation
+	output.Write(buf.Bytes())
+	output.Flush()
 }
 
 func getRealIndex(entries []FileEntry, name string) int {
@@ -167,8 +173,18 @@ func joinSelectedFiles(listsDir string, selectedEntries []FileEntry) error {
 }
 
 func main() {
-	// Terminal initialization
-	fmt.Print(clearScreen)
+	var buf bytes.Buffer
+	buf.Grow(bufferSize)
+
+	// Create output buffer for direct writes
+	output := bufio.NewWriter(os.Stdout)
+	defer output.Flush()
+
+	// Initialize terminal
+	buf.WriteString("\033[H\033[J")
+	output.Write(buf.Bytes())
+	output.Flush()
+
 	fmt.Print(enterAltScreen + hideCursor)
 	defer fmt.Print(showCursor + exitAltScreen)
 
@@ -214,14 +230,19 @@ func main() {
 	}
 	defer keyboard.Close()
 
-	var buf bytes.Buffer
-	currentIndex := 0
-	scrollOffset := 0
+	var currentIndex, scrollOffset int
 
 	for {
-		buf.Reset()
-		drawScreen(&buf, entries, currentIndex, scrollOffset, false)
-		os.Stdout.Write(buf.Bytes())
+		start := time.Now()
+
+		// Draw screen using buffered output
+		drawScreen(&buf, entries, currentIndex, scrollOffset, output)
+
+		// Precise frame timing
+		elapsed := time.Since(start)
+		if elapsed < frameTime {
+			time.Sleep(frameTime - elapsed)
+		}
 
 		_, key, err := keyboard.GetKey()
 		if err != nil {

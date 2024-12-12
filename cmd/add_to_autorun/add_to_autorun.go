@@ -24,8 +24,9 @@ const (
 	exitAltScreen       = "\033[?1049l"
 	hideCursor          = "\033[?25l"
 	showCursor          = "\033[?25h"
-	fps                 = 144
+	fps                 = 240
 	frameTime           = time.Second / time.Duration(fps)
+	bufferSize          = 4096
 )
 
 var version string
@@ -204,12 +205,16 @@ func main() {
 	defer fmt.Print(showCursor + exitAltScreen)
 
 	var buf bytes.Buffer
+	buf.Grow(bufferSize)
 
-	// First fill the buffer
-	printWelcomeMessage(&buf)
-	// Then clear screen and output content
-	fmt.Print(clearScreenSequence)
-	fmt.Print(buf.String())
+	// Pre-calculate terminal dimensions
+	_, termHeight := getTerminalSize()
+	visibleItems := termHeight - 12
+	startIdx := 0
+
+	// Create output buffer for direct writes
+	output := bufio.NewWriter(os.Stdout)
+	defer output.Flush()
 
 	options := getOptions()
 	if len(options) == 0 {
@@ -227,103 +232,115 @@ func main() {
 	}
 	defer keyboard.Close()
 
-	_, termHeight := getTerminalSize()
-	visibleItems := termHeight - 12 // 12 lines for welcome message and padding
-	startIdx := 0
-
 	// Main loop
 	for {
 		start := time.Now()
 
 		buf.Reset()
-		// Move cursor to start and clear screen to the end
 		buf.WriteString("\033[H\033[J")
 
 		printWelcomeMessage(&buf)
 
-		// Calculate range of visible elements
-		if currentSelection >= startIdx+visibleItems {
-			startIdx = currentSelection - visibleItems + 1
+		// Calculate visible range and scroll position
+		endIdx := min(startIdx+visibleItems, len(options))
+
+		// Update scroll position before selection becomes invisible
+		if currentSelection >= startIdx+visibleItems-1 {
+			startIdx = currentSelection - visibleItems + 2
 		} else if currentSelection < startIdx {
 			startIdx = currentSelection
 		}
 
-		endIdx := startIdx + visibleItems
-		if endIdx > len(options) {
-			endIdx = len(options)
+		// Ensure startIdx stays within bounds
+		if startIdx < 0 {
+			startIdx = 0
+		}
+		if startIdx > len(options)-visibleItems {
+			startIdx = max(0, len(options)-visibleItems)
 		}
 
-		// Show up arrow if there are hidden elements above
+		// Show scroll indicators only if needed
 		if startIdx > 0 {
 			buf.WriteString(fmt.Sprintf("%s↑ more items above%s\n", colorGrey, colorReset))
 		}
 
-		// Output visible options
+		// Batch write visible options with proper spacing
 		for i := startIdx; i < endIdx; i++ {
-			prefix := "  "
 			if i == currentSelection {
-				prefix = "► "
-				buf.WriteString(fmt.Sprintf("%s%s%s%s\n", colorCyan, prefix, options[i], colorReset))
+				buf.WriteString(fmt.Sprintf("%s► %s%s\n", colorCyan, options[i], colorReset))
 			} else {
-				buf.WriteString(fmt.Sprintf("%s%s\n", prefix, options[i]))
+				buf.WriteString(fmt.Sprintf("  %s\n", options[i]))
 			}
 		}
 
-		// Show down arrow if there are hidden elements below
+		// Show bottom scroll indicator with proper spacing
 		if endIdx < len(options) {
 			buf.WriteString(fmt.Sprintf("%s↓ more items below%s\n", colorGrey, colorReset))
 		}
 
-		// Output buffer in one operation
-		os.Stdout.Write(buf.Bytes())
+		// Single write operation to terminal
+		output.Write(buf.Bytes())
+		output.Flush()
 
-		// Precise timing for next frame
+		// Precise frame timing
 		elapsed := time.Since(start)
 		if elapsed < frameTime {
 			time.Sleep(frameTime - elapsed)
 		}
 
-		// Handle keyboard input
-		_, key, err := keyboard.GetKey()
-		if err != nil {
-			fmt.Println("Error reading keyboard:", err)
-			return
-		}
-
-		switch key {
-		case keyboard.KeyArrowUp:
-			if currentSelection > 0 {
-				currentSelection--
-			}
-		case keyboard.KeyArrowDown:
-			if currentSelection < len(options)-1 {
-				currentSelection++
-			}
-		case keyboard.KeyEnter:
-			clearScreen(&buf)
-			switch options[currentSelection] {
-			case "Delete service from autorun":
-				serviceManager.removeService()
-			case "Run BLOCKCHECK (Auto-setting BAT parameters)":
-				// Restore normal terminal state before launch
-				fmt.Print(showCursor + exitAltScreen)
-				keyboard.Close()
-
-				_, err := serviceManager.runPowershellCommand("Start-Process 'blockcheck.cmd'")
-				if err != nil {
-					fmt.Printf("%s⚠ Error running BLOCKCHECK: %v%s\n", colorRed, err, colorReset)
+		// Non-blocking keyboard input
+		if _, key, err := keyboard.GetKey(); err == nil {
+			switch key {
+			case keyboard.KeyArrowUp:
+				if currentSelection > 0 {
+					currentSelection--
 				}
-				return
-			default:
-				batPath := filepath.Join("pre-configs", options[currentSelection])
-				serviceManager.installService(batPath)
-			}
+			case keyboard.KeyArrowDown:
+				if currentSelection < len(options)-1 {
+					currentSelection++
+				}
+			case keyboard.KeyEnter:
+				clearScreen(&buf)
+				switch options[currentSelection] {
+				case "Delete service from autorun":
+					serviceManager.removeService()
+				case "Run BLOCKCHECK (Auto-setting BAT parameters)":
+					// Restore normal terminal state before launch
+					fmt.Print(showCursor + exitAltScreen)
+					keyboard.Close()
 
-			fmt.Println("Ready! You can close this window")
-			bufio.NewReader(os.Stdin).ReadBytes('\n')
-			return
-		case keyboard.KeyEsc:
-			return
+					_, err := serviceManager.runPowershellCommand("Start-Process 'blockcheck.cmd'")
+					if err != nil {
+						fmt.Printf("%s⚠ Error running BLOCKCHECK: %v%s\n", colorRed, err, colorReset)
+					}
+					return
+				default:
+					batPath := filepath.Join("pre-configs", options[currentSelection])
+					serviceManager.installService(batPath)
+				}
+
+				fmt.Println("Ready! You can close this window")
+				bufio.NewReader(os.Stdin).ReadBytes('\n')
+				return
+			case keyboard.KeyEsc:
+				return
+			}
 		}
 	}
+}
+
+// Helper function for min
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// Add helper function for max
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
