@@ -98,7 +98,6 @@ func main() {
 	s.HideCursor = true
 	s.Start()
 	filesToAdd := map[string]string{
-		"___README.TXT":                       filepath.Join(resourcesDir, "___README.TXT"),
 		"blockcheck.cmd":                      filepath.Join(resourcesDir, "blockcheck.cmd"),
 		"Add to autorun.exe":                  filepath.Join(buildDir, "add_to_autorun.exe"),
 		"Automatically search pre-config.exe": filepath.Join(buildDir, "preconfig_tester.exe"),

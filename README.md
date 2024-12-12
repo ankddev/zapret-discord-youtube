@@ -111,7 +111,7 @@ This project is separated in few folders:
 * `bin` contains pre-built binaries from original repository
 * `pre-configs` contains pre-configs (BAT files)
 * `lists` contains lists of domains to work with
-* `resources` contains `README.txt` and `blockcheck.cmd` files
+* `resources` contains `blockcheck.cmd` file
 * `scripts` contains scripts for building and creating release archive
 * `cmd` contains source code for utilities
   * `add_to_autorun` contains code for utility that helps you to add fix to autorun
