@@ -189,6 +189,7 @@ func main() {
 	answer = strings.ToLower(strings.TrimSpace(answer))
 
 	if answer != "y" && answer != "yes" {
+		fmt.Println("Update cancelled.")
 		waitForEnter()
 		return
 	}
