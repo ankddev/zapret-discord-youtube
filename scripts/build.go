@@ -104,6 +104,7 @@ func main() {
 		"Automatically search pre-config.exe": filepath.Join(buildDir, "preconfig_tester.exe"),
 		"Run pre-config.exe":                  filepath.Join(buildDir, "run_preconfig.exe"),
 		"Set domain list.exe":                 filepath.Join(buildDir, "select_domains.exe"),
+		"Check for updates.exe":               filepath.Join(buildDir, "check_for_updates.exe"),
 	}
 
 	for zipPath, fsPath := range filesToAdd {
@@ -163,6 +164,9 @@ func addFileToZip(zipWriter *zip.Writer, zipPath string, fsPath string) error {
 func version() string {
 	if versionEnv := os.Getenv("VERSION"); versionEnv != "" {
 		return versionEnv
+	}
+	if content, err := os.ReadFile(".service/version.txt"); err == nil {
+		return strings.TrimSpace("v" + string(content))
 	}
 	if desc, err := cmdOutput("git", "describe", "--tags"); err == nil {
 		return desc

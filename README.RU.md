@@ -10,6 +10,8 @@
 # Настройка
 ## Скачать
 Вы можете загрузить эту сборку из [релизов](https://github.com/ankddev/zapret-discord-youtube/releases) или [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
+## Обновление
+Вы можете обновить эту сборку, запустив `Check for updates.exe`. Он проверит наличие обновлений и скачает их, если они доступны.
 ## Использование
 * Отключите все VPNы, Zapret, GoodbyeDPI, Warp и другой похожий софт
 * **Разархивируйте** загуженный архив
