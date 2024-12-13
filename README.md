@@ -89,6 +89,13 @@ sc delete WinDivert
 ## How to setup Zapret on Linux
 Check [this](https://github.com/bol-van/zapret/blob/master/docs/quick_start.txt).
 
+# See Also
+
+- [codewars-api-rs](https://github.com/ankddev/codewars-api-rs) - Rust library for Codewars API
+- [conemu-progressbar-go](https://github.com/ankddev/conemu-progressbar-go) - Progress bar for ConEmu for Go
+- [envfetch](https://github.com/ankddev/envfetch) - Lightweight crossplatform CLI tool for working with environment variables
+- [terminal-go](https://github.com/ankddev/terminal-go) - Go library for working with ANSI/VT terminal sequences
+
 # Contributing
 * Fork this repo
 * Clone your fork
