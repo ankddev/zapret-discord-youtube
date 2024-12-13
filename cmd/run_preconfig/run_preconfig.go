@@ -61,13 +61,14 @@ func getTerminalSize() (int, int) {
 	return cols, rows
 }
 
-func printWelcomeMessage(buf *bytes.Buffer) int {
+func printWelcomeMessage(buf *bytes.Buffer, configCount int) int {
 	messages := []string{
 		"Welcome!",
 		"This program can run any pre-config BAT file.",
 		"Author: ANKDDEV https://github.com/ankddev",
 		fmt.Sprintf("Version: %s", version),
 		"===",
+		fmt.Sprintf("Found %d pre-configs", configCount),
 		"\nUsing ARROWS on your keyboard, select BAT file from list for running or select 'Run BLOCKCHECK (Auto-setting BAT parameters)' or select 'Exit'.\n",
 		"For selection press ENTER.",
 	}
@@ -80,7 +81,7 @@ func printWelcomeMessage(buf *bytes.Buffer) int {
 
 var version string
 
-func getOptions() []string {
+func getOptions() ([]string, int) {
 	options := []string{
 		"Exit",
 		"Run BLOCKCHECK (Auto-setting BAT parameters)",
@@ -88,12 +89,12 @@ func getOptions() []string {
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return options
+		return options, 0
 	}
 
 	files, err := os.ReadDir(filepath.Join(currentDir, "pre-configs"))
 	if err != nil {
-		return options
+		return options, 0
 	}
 
 	var batFiles []string
@@ -106,33 +107,28 @@ func getOptions() []string {
 	sort.Strings(batFiles)
 	options = append(options, batFiles...)
 
-	return options
+	return options, len(batFiles)
 }
 
 func Run() error {
 	setupTerminalCleanup()
 	defer fmt.Print(showCursor + exitAltScreen)
 
-	// Initialize terminal
 	initTerminal()
 
-	// Get terminal size
 	_, termHeight := getTerminalSize()
 
 	var buf bytes.Buffer
 
-	// Print welcome message
-	currentLine := printWelcomeMessage(&buf)
-	fmt.Print(buf.String())
-
-	// Get options list
-	options := getOptions()
+	options, configCount := getOptions()
 	if len(options) == 0 {
 		fmt.Println("Can't find any BAT files in current directory.")
 		return nil
 	}
 
-	// Start main UI loop
+	currentLine := printWelcomeMessage(&buf, configCount)
+	fmt.Print(buf.String())
+
 	if err := runMainLoop(&buf, options, currentLine, termHeight); err != nil {
 		return err
 	}
@@ -148,10 +144,8 @@ func main() {
 }
 
 func runMainLoop(buf *bytes.Buffer, options []string, startRow, termHeight int) error {
-	// Pre-allocate buffer
 	buf.Grow(bufferSize)
 
-	// Create output buffer for direct writes
 	output := bufio.NewWriter(os.Stdout)
 	defer output.Flush()
 
@@ -170,24 +164,21 @@ func runMainLoop(buf *bytes.Buffer, options []string, startRow, termHeight int) 
 		buf.Reset()
 		buf.WriteString("\033[H\033[J")
 
-		printWelcomeMessage(buf)
+		options, configCount := getOptions()
+		printWelcomeMessage(buf, configCount)
 
-		// Show scroll indicators
 		if scrollOffset > 0 {
 			buf.WriteString(fmt.Sprintf("%s↑ more items above%s\n", colorGrey, colorReset))
 		}
 
-		// Calculate visible range
 		endIdx := min(scrollOffset+maxVisibleOptions, len(options))
 
-		// Update scroll position
 		if currentSelection >= scrollOffset+maxVisibleOptions-1 {
 			scrollOffset = currentSelection - maxVisibleOptions + 2
 		} else if currentSelection < scrollOffset {
 			scrollOffset = currentSelection
 		}
 
-		// Ensure scroll bounds
 		if scrollOffset < 0 {
 			scrollOffset = 0
 		}
@@ -195,7 +186,6 @@ func runMainLoop(buf *bytes.Buffer, options []string, startRow, termHeight int) 
 			scrollOffset = max(0, len(options)-maxVisibleOptions)
 		}
 
-		// Batch write visible options
 		for i := scrollOffset; i < endIdx; i++ {
 			if i == currentSelection {
 				buf.WriteString(fmt.Sprintf("%s► %s%s\n", colorCyan, options[i], colorReset))
@@ -208,17 +198,14 @@ func runMainLoop(buf *bytes.Buffer, options []string, startRow, termHeight int) 
 			buf.WriteString(fmt.Sprintf("%s↓ more items below%s\n", colorGrey, colorReset))
 		}
 
-		// Single write operation
 		output.Write(buf.Bytes())
 		output.Flush()
 
-		// Precise frame timing
 		elapsed := time.Since(start)
 		if elapsed < frameTime {
 			time.Sleep(frameTime - elapsed)
 		}
 
-		// Non-blocking keyboard input
 		if _, key, err := keyboard.GetKey(); err == nil {
 			switch key {
 			case keyboard.KeyArrowUp:

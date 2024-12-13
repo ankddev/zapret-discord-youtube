@@ -127,7 +127,7 @@ func (sm *ServiceManager) installService(batFilePath string) error {
 	return nil
 }
 
-func getOptions() []string {
+func getOptions() ([]string, int) {
 	options := []string{
 		"Exit",
 		"Delete service from autorun",
@@ -136,12 +136,12 @@ func getOptions() []string {
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return options
+		return options, 0
 	}
 
 	files, err := os.ReadDir(filepath.Join(currentDir, "pre-configs"))
 	if err != nil {
-		return options
+		return options, 0
 	}
 
 	var batFiles []string
@@ -154,20 +154,21 @@ func getOptions() []string {
 	sort.Strings(batFiles)
 	options = append(options, batFiles...)
 
-	return options
+	return options, len(batFiles)
 }
 
 func clearScreen(buf *bytes.Buffer) {
 	buf.WriteString(clearScreenSequence)
 }
 
-func printWelcomeMessage(buf *bytes.Buffer) {
+func printWelcomeMessage(buf *bytes.Buffer, configCount int) {
 	messages := []string{
 		"Welcome!",
 		"This program can install BAT file as service with autorun.",
 		"Author: ANKDDEV https://github.com/ankddev",
 		fmt.Sprintf("Version: %s", version),
 		"===",
+		fmt.Sprintf("Found %d pre-configs", configCount),
 		"\nUsing ARROWS on your keyboard, select BAT file from list for installing service 'discordfix_zapret' or select 'Delete service from autorun' or 'Run BLOCKCHECK (Auto-setting BAT parameters)' or select 'Exit'.\n",
 		"For selection press ENTER.",
 	}
@@ -217,7 +218,7 @@ func main() {
 	output := bufio.NewWriter(os.Stdout)
 	defer output.Flush()
 
-	options := getOptions()
+	options, configCount := getOptions()
 	if len(options) == 0 {
 		fmt.Println("Can't find any BAT files in current directory.")
 		return
@@ -240,7 +241,7 @@ func main() {
 		buf.Reset()
 		buf.WriteString("\033[H\033[J")
 
-		printWelcomeMessage(&buf)
+		printWelcomeMessage(&buf, configCount)
 
 		// Calculate visible range and scroll position
 		endIdx := min(startIdx+visibleItems, len(options))
