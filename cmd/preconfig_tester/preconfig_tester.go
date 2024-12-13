@@ -331,9 +331,9 @@ func runBypassCheck(config Config) error {
 	fmt.Printf("\nStarting testing domains: %s\n", config.targetDomain)
 	fmt.Println("------------------------------------------------")
 
+	needBypass := false
 	// Check DPI for each domain
 	for _, domain := range domains {
-		// Remove port before DPI check but keep it for display
 		domainForCheck := strings.Split(domain, ":")[0]
 		fmt.Printf("\nChecking DPI blocks for %s...\n", domainForCheck)
 		result, err := checkDPIFingerprint(domainForCheck)
@@ -352,6 +352,13 @@ func runBypassCheck(config Config) error {
 			fmt.Printf("Check internet connection and if domain %s is correct.\n", domainForCheck)
 			continue
 		}
+
+		needBypass = true
+	}
+
+	if !needBypass {
+		fmt.Println("\nNo DPI blocks detected for any domain. No need to test pre-configs.")
+		return nil
 	}
 
 	fmt.Println("------------------------------------------------")
