@@ -227,15 +227,14 @@ func main() {
 	}
 
 	parentDir := filepath.Dir(currentDir)
-	downloadDir := filepath.Join(parentDir, "downloads")
-	if err := os.MkdirAll(downloadDir, 0755); err != nil {
+	if err := os.MkdirAll(parentDir, 0755); err != nil {
 		fmt.Printf("%sError creating download directory: %v%s\n", colorRed, err, colorReset)
 		waitForEnter()
 		return
 	}
 
 	// Download the release with version in filename
-	destPath := filepath.Join(downloadDir, fmt.Sprintf("zapret-discord-youtube-ankddev-%s.zip", release.TagName))
+	destPath := filepath.Join(parentDir, fmt.Sprintf("zapret-discord-youtube-ankddev-%s.zip", release.TagName))
 	absPath, err := filepath.Abs(destPath)
 	if err != nil {
 		fmt.Printf("%sError getting absolute path: %v%s\n", colorRed, err, colorReset)
