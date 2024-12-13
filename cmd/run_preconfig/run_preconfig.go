@@ -171,6 +171,10 @@ func runMainLoop(buf *bytes.Buffer, options []string, startRow, termHeight int) 
 			buf.WriteString(fmt.Sprintf("%s↑ more items above%s\n", colorGrey, colorReset))
 		}
 
+		if currentSelection >= len(options) {
+			currentSelection = len(options) - 1
+		}
+
 		endIdx := min(scrollOffset+maxVisibleOptions, len(options))
 
 		if currentSelection >= scrollOffset+maxVisibleOptions-1 {

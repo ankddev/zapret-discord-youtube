@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -40,6 +42,7 @@ var domainList = []struct {
 	{"4", "speedtest.net"},
 	{"5", "steampowered.com"},
 	{"6", "custom"},
+	{"7", "custom_multiple"},
 	{"0", "exit"},
 }
 
@@ -99,13 +102,21 @@ func requestElevation() error {
 		return fmt.Errorf("failed to get executable path: %v", err)
 	}
 
-	cmd := exec.Command("powershell", "Start-Process", executable, "-Verb", "RunAs", "-ArgumentList", "--elevated")
+	cmd := exec.Command("powershell", "-Command", fmt.Sprintf(`
+		$proc = Start-Process -FilePath "%s" -Verb RunAs -PassThru -WindowStyle Normal
+		if ($proc.ExitCode -ne 0) {
+			exit $proc.ExitCode
+		}
+	`, executable))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
 	return cmd.Run()
 }
 
 func ensureProcessTerminated(processName string) {
 	cmd := exec.Command("taskkill", "/F", "/IM", processName)
-	cmd.Run() // Игнорируем ошибки, так как процесс может не существовать
+	cmd.Run() // Ignore errors as the process may not exist
 }
 
 func waitForProcess(processName string, timeout time.Duration) bool {
@@ -138,14 +149,17 @@ func testConnection(domain string, timeout time.Duration) bool {
 	return err == nil
 }
 
-func getDomainChoice() (string, error) {
+func getDomainChoice() ([]string, error) {
 	fmt.Println("\nSelect domain for checking:")
 	for _, item := range domainList {
-		if item.domain == "exit" {
+		switch item.domain {
+		case "exit":
 			fmt.Printf("%s. Exit\n", item.number)
-		} else if item.domain == "custom" {
+		case "custom":
 			fmt.Printf("%s. Enter your own domain\n", item.number)
-		} else {
+		case "custom_multiple":
+			fmt.Printf("%s. Enter multiple domains (space-separated)\n", item.number)
+		default:
 			fmt.Printf("%s. %s\n", item.number, item.domain)
 		}
 	}
@@ -155,7 +169,7 @@ func getDomainChoice() (string, error) {
 		fmt.Print("\nEnter number of variant: ")
 		choice, err := reader.ReadString('\n')
 		if err != nil {
-			return "", fmt.Errorf("error reading input: %v", err)
+			return nil, fmt.Errorf("error reading input: %v", err)
 		}
 		choice = strings.TrimSpace(choice)
 
@@ -168,19 +182,41 @@ func getDomainChoice() (string, error) {
 				}
 				if item.domain == "custom" {
 					fmt.Print("Enter domain (for example, example.com): ")
-
 					domain, err := reader.ReadString('\n')
 					if err != nil {
-						return "", err
+						return nil, err
 					}
 					domain = strings.TrimSpace(domain)
 					if isValidDomain(domain) {
-						return formatDomainWithPort(domain), nil
+						return []string{formatDomainWithPort(domain)}, nil
 					}
 					fmt.Println("Invalid domain format. Use format domain.com")
 					continue
 				}
-				return formatDomainWithPort(item.domain), nil
+				if item.domain == "custom_multiple" {
+					fmt.Print("Enter domains separated by spaces: ")
+					domains, err := reader.ReadString('\n')
+					if err != nil {
+						return nil, err
+					}
+
+					domainList := strings.Fields(domains)
+					var formattedDomains []string
+
+					for _, domain := range domainList {
+						if !isValidDomain(domain) {
+							fmt.Printf("Invalid domain format for '%s'. Use format domain.com\n", domain)
+							continue
+						}
+						formattedDomains = append(formattedDomains, formatDomainWithPort(domain))
+					}
+
+					if len(formattedDomains) > 0 {
+						return formattedDomains, nil
+					}
+					continue
+				}
+				return []string{formatDomainWithPort(item.domain)}, nil
 			}
 		}
 		fmt.Printf("Invalid selection. Please select number from 0 to %d\n", len(domainList)-1)
@@ -219,54 +255,102 @@ func formatDomainWithPort(domain string) string {
 
 func checkDPIFingerprint(domain string) (DPITestResult, error) {
 	cmd := exec.Command("powershell", "-Command", fmt.Sprintf(`
+		# Save console settings
+		$originalForeground = $host.UI.RawUI.ForegroundColor
+		$originalBackground = $host.UI.RawUI.BackgroundColor
+		
+		# Force TLS 1.2
+		[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 		try {
-			$webRequest = [System.Net.WebRequest]::Create("https://%s")
+			$url = "https://%s"
+			Write-Information "Trying to connect to $url"
+			
+			$webRequest = [System.Net.WebRequest]::Create($url)
 			$webRequest.Timeout = 5000
-			$response = $webRequest.GetResponse()
-			$response.Close()
-			return 0  # NoDPI
-		} catch [System.Net.WebException] {
-			if ($_.Exception.Message -like "*actively refused*") {
-				return 1  # HasDPI
+			$webRequest.AllowAutoRedirect = $false
+			
+			try {
+				$response = $webRequest.GetResponse()
+				$response.Close()
+				Write-Output "0"  # NoDPI
+			} catch [System.Net.WebException] {
+				$exception = $_.Exception
+				Write-Information "Exception details: $($exception.Message)"
+				Write-Information "Status: $($exception.Status)"
+				
+				if ($exception.Message -like "*actively refused*" -or 
+					$exception.Message -like "*connection was forcibly closed*" -or
+					$exception.Status -eq [System.Net.WebExceptionStatus]::SecureChannelFailure -or
+					$exception.Status -eq [System.Net.WebExceptionStatus]::TrustFailure -or
+					$exception.Status -eq [System.Net.WebExceptionStatus]::ProtocolError) {
+					Write-Output "1"  # HasDPI
+				} elseif ($exception.Status -eq [System.Net.WebExceptionStatus]::NameResolutionFailure) {
+					Write-Output "2"  # DNS resolution failed
+					Write-Information "DNS resolution failed"
+				} elseif ($exception.Status -eq [System.Net.WebExceptionStatus]::Timeout) {
+					Write-Output "1"  # Treat timeout as potential DPI
+					Write-Information "Connection timed out - possible DPI"
+				} else {
+					Write-Output "2"  # NoConnection
+					Write-Information "Unknown connection error"
+				}
 			}
-			return 2  # NoConnection
+		} catch {
+			Write-Output "2"  # NoConnection
+			Write-Information "Unexpected error: $_"
+		} finally {
+			# Restore console settings
+			$host.UI.RawUI.ForegroundColor = $originalForeground
+			$host.UI.RawUI.BackgroundColor = $originalBackground
 		}
+		exit 0
 	`, domain))
 
+	cmd.Stderr = os.Stderr // Show diagnostic output
 	output, err := cmd.Output()
 	if err != nil {
-		return NoConnection, err
+		if len(output) == 0 {
+			return NoConnection, fmt.Errorf("no output from DPI check: %v", err)
+		}
 	}
 
-	result, err := strconv.Atoi(strings.TrimSpace(string(output)))
+	// Берем только последнюю строку вывода, которая содержит результат
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	result, err := strconv.Atoi(lines[len(lines)-1])
 	if err != nil {
-		return NoConnection, err
+		return NoConnection, fmt.Errorf("invalid output from DPI check: %v", err)
 	}
 
 	return DPITestResult(result), nil
 }
 
 func runBypassCheck(config Config) error {
-	domainWithoutPort := strings.Split(config.targetDomain, ":")[0]
+	domains := strings.Split(config.targetDomain, " ")
 
-	fmt.Printf("\nStarting testing domain: %s\n", config.targetDomain)
+	fmt.Printf("\nStarting testing domains: %s\n", config.targetDomain)
 	fmt.Println("------------------------------------------------")
 
-	fmt.Println("Checking DPI blocks...")
-	result, err := checkDPIFingerprint(domainWithoutPort)
-	if err != nil {
-		fmt.Printf("Error occurred while checking: %v\n", err)
-	} else {
-		fmt.Printf("Checking result: %s\n", result)
+	// Check DPI for each domain
+	for _, domain := range domains {
+		// Remove port before DPI check but keep it for display
+		domainForCheck := strings.Split(domain, ":")[0]
+		fmt.Printf("\nChecking DPI blocks for %s...\n", domainForCheck)
+		result, err := checkDPIFingerprint(domainForCheck)
+		if err != nil {
+			fmt.Printf("Checking result for %s: %s (with error: %v)\n", domainForCheck, result, err)
+		} else {
+			fmt.Printf("Checking result for %s: %s\n", domainForCheck, result)
+		}
 
 		if result == NoDPI {
-			fmt.Println("Using DPI spoofer not required.")
-			return nil
+			fmt.Printf("Using DPI spoofer not required for %s.\n", domainForCheck)
+			continue
 		}
 
 		if result == NoConnection {
-			fmt.Println("Check internet connection and if domain is correct.")
-			return nil
+			fmt.Printf("Check internet connection and if domain %s is correct.\n", domainForCheck)
+			continue
 		}
 	}
 
@@ -282,10 +366,44 @@ func runBypassCheck(config Config) error {
 	for _, batFile := range batFiles {
 		fmt.Printf("\n%sRunning pre-config: %s%s\n", colorMagenta, batFile, colorReset)
 
-		// Ensure no previous process is running
 		ensureProcessTerminated(config.processName)
 
-		cmd := exec.Command("cmd", "/c", batFile)
+		cmd := exec.Command("powershell", "-Command", fmt.Sprintf(`
+			# Save console settings
+			$originalForeground = $host.UI.RawUI.ForegroundColor
+			$originalBackground = $host.UI.RawUI.BackgroundColor
+			$originalBufferSize = $host.UI.RawUI.BufferSize
+			$originalWindowSize = $host.UI.RawUI.WindowSize
+
+			# Save font settings
+			$key = 'HKCU:\Console'
+			$originalFontSize = Get-ItemProperty -Path $key -Name 'FontSize' -ErrorAction SilentlyContinue
+			$originalFaceName = Get-ItemProperty -Path $key -Name 'FaceName' -ErrorAction SilentlyContinue
+			$originalFontFamily = Get-ItemProperty -Path $key -Name 'FontFamily' -ErrorAction SilentlyContinue
+			
+			try {
+				# Execute BAT file
+				cmd /c "%s"
+			} finally {
+				# Restore console settings
+				$host.UI.RawUI.ForegroundColor = $originalForeground
+				$host.UI.RawUI.BackgroundColor = $originalBackground
+				$host.UI.RawUI.BufferSize = $originalBufferSize
+				$host.UI.RawUI.WindowSize = $originalWindowSize
+
+				# Restore font settings
+				if ($originalFontSize) {
+					Set-ItemProperty -Path $key -Name 'FontSize' -Value $originalFontSize.FontSize
+				}
+				if ($originalFaceName) {
+					Set-ItemProperty -Path $key -Name 'FaceName' -Value $originalFaceName.FaceName
+				}
+				if ($originalFontFamily) {
+					Set-ItemProperty -Path $key -Name 'FontFamily' -Value $originalFontFamily.FontFamily
+				}
+			}
+		`, batFile))
+
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
@@ -300,28 +418,36 @@ func runBypassCheck(config Config) error {
 			continue
 		}
 
-		if testConnection(config.targetDomain, config.connectionTimeout) {
+		// Check all domains
+		allDomainsWork := true
+		for _, domain := range domains {
+			if !testConnection(domain, config.connectionTimeout) {
+				fmt.Printf("%s[FAIL] Failed to establish connection to %s using pre-config: %s%s\n",
+					colorRed, domain, batFile, colorReset)
+				allDomainsWork = false
+				break
+			}
+		}
+
+		if allDomainsWork {
 			filename := filepath.Base(batFile)
-			fmt.Printf("\n%s!!!!!!!!!!!!!\n[SUCCESS] It seems, this pre-config is suitable for you - %s\n!!!!!!!!!!!!!\n%s\n",
+			fmt.Printf("\n%s!!!!!!!!!!!!!\n[SUCCESS] It seems, this pre-config is suitable for all specified domains - %s\n!!!!!!!!!!!!!\n%s\n",
 				colorGreen, filename, colorReset)
 			cmd.Process.Kill()
 			success = true
 			break
-		} else {
-			fmt.Printf("%s[FAIL] Failed to establish connection using pre-config: %s%s\n",
-				colorRed, batFile, colorReset)
-			cmd.Process.Kill()
 		}
+
+		cmd.Process.Kill()
 	}
 
-	// Final cleanup
 	ensureProcessTerminated(config.processName)
 	time.Sleep(500 * time.Millisecond)
 	ensureProcessTerminated(config.processName)
 
 	if !success {
 		fmt.Println("\n------------------------------------------------")
-		fmt.Println("Unfortunately, not found pre-config we can establish connection with :(")
+		fmt.Println("Unfortunately, not found pre-config we can establish connection with for all specified domains :(")
 		fmt.Println("Try to run BLOCKCHECK, to find necessary parameters for BAT file.")
 	}
 
@@ -329,6 +455,15 @@ func runBypassCheck(config Config) error {
 }
 
 func main() {
+	// Add signal handling at the start of main
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		fmt.Print(showCursor + exitAltScreen)
+		os.Exit(1)
+	}()
+
 	var buf bytes.Buffer
 	buf.Grow(bufferSize)
 
@@ -354,10 +489,12 @@ func main() {
 			return
 		}
 		fmt.Print(showCursor + exitAltScreen)
+		// Wait a bit to ensure new process starts
+		time.Sleep(1 * time.Second)
 		os.Exit(0)
 	}
 
-	targetDomain, err := getDomainChoice()
+	targetDomains, err := getDomainChoice()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -365,7 +502,7 @@ func main() {
 
 	config := Config{
 		batchDir:          "pre-configs",
-		targetDomain:      targetDomain,
+		targetDomain:      strings.Join(targetDomains, " "),
 		processName:       "winws.exe",
 		processWaitTime:   10 * time.Second,
 		connectionTimeout: 5 * time.Second,
@@ -373,7 +510,7 @@ func main() {
 
 	// Use buffered output for all writes
 	buf.Reset()
-	buf.WriteString(fmt.Sprintf("\nStarting testing domain: %s\n", config.targetDomain))
+	buf.WriteString(fmt.Sprintf("\nStarting testing domains: %s\n", config.targetDomain))
 	output.Write(buf.Bytes())
 	output.Flush()
 
