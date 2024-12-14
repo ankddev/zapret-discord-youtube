@@ -1,0 +1,17 @@
+viber.com
+api.viber.com
+account.viber.com
+share.viber.com
+stickers.viber.com
+chats.viber.com
+support.viber.com
+www.viber.com
+dl-media.viber.com
+media.viber.com
+ads.viber.com
+static.viber.com
+ar.viber.com
+billing.viber.com
+pg.viber.com
+chatapi.viber.com
+invite.viber.com

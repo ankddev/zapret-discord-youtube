@@ -1,12 +1,12 @@
 <h1 align="center">zapret-discord-youtube</h1>
-<h6 align="center">Сборка Zapret для Windows для имправления работы YouTube и Discord в России</h6>
+<h6 align="center">Сборка Zapret для Windows для исправления работы YouTube, Discord и Viber в России</h6>
 <div align="center">
   <a href="https://github.com/ankddev/zapret-discord-youtube/releases"><img alt="GitHub Downloads" src="https://img.shields.io/github/downloads/ankddev/zapret-discord-youtube/total"></a>
   <a href="https://github.com/ankddev/zapret-discord-youtube/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/ankddev/zapret-discord-youtube"></a>
   <a href="https://github.com/ankddev/zapret-discord-youtube"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ankddev/zapret-discord-youtube?style=flat"></a>
 </div>
 
-Эта сбока включает в себя файлы из [оригинального репозитория](https://github.com/bol-van/zapret-win-bundle), кастомные прре-конфиги для исправления работы YouTube, Discord oили других сервисов в России и некоторые полезные утилиты, написанные на Go.
+Эта сбока включает в себя файлы из [оригинального репозитория](https://github.com/bol-van/zapret-win-bundle), кастомные пре-конфиги для исправления работы YouTube, Discord, Viber или других сервисов в России и некоторые полезные утилиты, написанные на Go.
 # Настройка
 ## Скачать
 Вы можете загрузить эту сборку из [релизов](https://github.com/ankddev/zapret-discord-youtube/releases) или [GitHub Actions](https://github.com/ankddev/zapret-discord-youtube/actions).
@@ -20,6 +20,7 @@
   * UltimateFix or GeneralFix - Discord, YouTube и выбранные домены
   * DiscordFix - Discord
   * YouTubeFix - YouTube
+  * ViberFix - Viber
 * Наслаждайтесь!
 
 > [!TIP]
