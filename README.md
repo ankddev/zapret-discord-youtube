@@ -76,7 +76,7 @@ sc delete windivert14
 ```
 * Run fix again
 
-## Is viruses there
+## Are there any viruses here
 In this build there are no viruses, if you downloaded it from https://github.com/ankddev/zapret-discord-youtube/releases. If your antivirus detects viruses, please disable it or add fix folder to excluded folders.
 Here is description about viruses: https://github.com/bol-van/zapret/issues/393
 
