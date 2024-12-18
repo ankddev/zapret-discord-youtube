@@ -20,7 +20,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("[1/4] Building...")
+	s.Suffix = " [1/4] Building..."
+	s.FinalMSG = "[3/4] Building...\n"
+	s.HideCursor = true
+	s.Start()
 	ldflags := os.Getenv("GO_LDFLAGS")
 	ldflags = fmt.Sprintf("-X main.version=%s %s", version(), ldflags)
 	_ = os.Mkdir("build", os.ModePerm)
@@ -29,6 +32,7 @@ func main() {
 		fmt.Println("Build failed:", err)
 		os.Exit(1)
 	}
+        s.Stop()
 
 	// Get current directory
 	currentDir, err := os.Getwd()
@@ -198,15 +202,10 @@ func run(args ...string) error {
 	if err != nil {
 		return err
 	}
-	announce(args...)
 	cmd := exec.Command(exe, args[1:]...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
-}
-
-func announce(args ...string) {
-	fmt.Println(shellInspect(args))
 }
 
 func shellInspect(args []string) string {
