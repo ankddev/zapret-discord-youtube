@@ -19,7 +19,9 @@ func main() {
 	if !isWindows() {
 		os.Exit(1)
 	}
-
+	
+        s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
+	
 	s.Suffix = " [1/4] Building..."
 	s.FinalMSG = "[3/4] Building...\n"
 	s.HideCursor = true
@@ -80,7 +82,6 @@ func main() {
 		"bin":         binDir,
 	}
 
-	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.Suffix = " [2/4] Adding directories..."
 	s.FinalMSG = "[2/4] Adding directories...\n"
 	s.HideCursor = true
