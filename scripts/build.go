@@ -15,6 +15,7 @@ import (
 	"github.com/cli/safeexec"
 )
 
+// buildConfig is the configuration for the build process
 type buildConfig struct {
 	currentDir    string
 	buildDir      string
@@ -45,6 +46,7 @@ func main() {
 	fmt.Scanln()
 }
 
+// initBuildConfig initializes the build configuration
 func initBuildConfig() (*buildConfig, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -62,6 +64,7 @@ func initBuildConfig() (*buildConfig, error) {
 	}, nil
 }
 
+// runBuildSteps runs the build steps
 func runBuildSteps(config *buildConfig) error {
 	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.HideCursor = true
@@ -109,12 +112,14 @@ func runBuildSteps(config *buildConfig) error {
 	return nil
 }
 
+// buildExecutables builds the executables
 func buildExecutables() error {
 	_ = os.Mkdir("build", os.ModePerm)
 	ldflags := fmt.Sprintf("-X main.version=%s %s", version(), os.Getenv("GO_LDFLAGS"))
 	return run("go", "build", "-ldflags", ldflags, "-o", "build", "./cmd/...")
 }
 
+// validatePaths validates the paths
 func validatePaths(config *buildConfig) error {
 	paths := []string{config.buildDir, config.listsDir, config.preConfigsDir}
 	for _, path := range paths {
@@ -125,6 +130,7 @@ func validatePaths(config *buildConfig) error {
 	return nil
 }
 
+// createZipFile creates the zip file
 func createZipFile(zipPath string) (*os.File, *zip.Writer, error) {
 	zipFile, err := os.Create(zipPath)
 	if err != nil {
@@ -133,6 +139,7 @@ func createZipFile(zipPath string) (*os.File, *zip.Writer, error) {
 	return zipFile, zip.NewWriter(zipFile), nil
 }
 
+// addDirectories adds the directories to the zip file
 func addDirectories(zipWriter *zip.Writer, config *buildConfig) error {
 	dirsToAdd := map[string]string{
 		"lists":       config.listsDir,
@@ -148,6 +155,7 @@ func addDirectories(zipWriter *zip.Writer, config *buildConfig) error {
 	return nil
 }
 
+// addFiles adds the files to the zip file
 func addFiles(zipWriter *zip.Writer, config *buildConfig) error {
 	filesToAdd := map[string]string{
 		"blockcheck.cmd":                      filepath.Join(config.currentDir, "blockcheck.cmd"),
@@ -166,6 +174,7 @@ func addFiles(zipWriter *zip.Writer, config *buildConfig) error {
 	return nil
 }
 
+// addDirToZip adds the directory to the zip file
 func addDirToZip(zipWriter *zip.Writer, zipPath string, fsPath string) error {
 	return filepath.Walk(fsPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -187,6 +196,7 @@ func addDirToZip(zipWriter *zip.Writer, zipPath string, fsPath string) error {
 	})
 }
 
+// addFileToZip adds the file to the zip file
 func addFileToZip(zipWriter *zip.Writer, zipPath string, fsPath string) error {
 	file, err := os.Open(fsPath)
 	if err != nil {
@@ -218,6 +228,7 @@ func version() string {
 	return rev
 }
 
+// cmdOutput runs a command and returns its output
 func cmdOutput(args ...string) (string, error) {
 	exe, err := safeexec.LookPath(args[0])
 	if err != nil {
@@ -239,6 +250,7 @@ func isWindows() bool {
 	return false
 }
 
+// run runs a command
 func run(args ...string) error {
 	exe, err := safeexec.LookPath(args[0])
 	if err != nil {
