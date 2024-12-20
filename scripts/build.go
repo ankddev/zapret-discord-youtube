@@ -19,11 +19,10 @@ func main() {
 	if !isWindows() {
 		os.Exit(1)
 	}
-	
-        s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
-	
+
+	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.Suffix = " [1/4] Building..."
-	s.FinalMSG = "[3/4] Building...\n"
+	s.FinalMSG = "[1/4] Build successful\n"
 	s.HideCursor = true
 	s.Start()
 	ldflags := os.Getenv("GO_LDFLAGS")
@@ -34,7 +33,7 @@ func main() {
 		fmt.Println("Build failed:", err)
 		os.Exit(1)
 	}
-        s.Stop()
+	s.Stop()
 
 	// Get current directory
 	currentDir, err := os.Getwd()
@@ -82,8 +81,9 @@ func main() {
 		"bin":         binDir,
 	}
 
+	s = spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.Suffix = " [2/4] Adding directories..."
-	s.FinalMSG = "[2/4] Adding directories...\n"
+	s.FinalMSG = "[2/4] Directories added\n"
 	s.HideCursor = true
 	s.Start()
 	for zipPath, fsPath := range dirsToAdd {
@@ -97,7 +97,7 @@ func main() {
 
 	// Add individual files
 	s.Suffix = " [3/4] Adding files..."
-	s.FinalMSG = "[3/4] Adding files...\n"
+	s.FinalMSG = "[3/4] Files added\n"
 	s.HideCursor = true
 	s.Start()
 	filesToAdd := map[string]string{
@@ -207,16 +207,4 @@ func run(args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
-}
-
-func shellInspect(args []string) string {
-	fmtArgs := make([]string, len(args))
-	for i, arg := range args {
-		if strings.ContainsAny(arg, " \t'\"") {
-			fmtArgs[i] = fmt.Sprintf("%q", arg)
-		} else {
-			fmtArgs[i] = arg
-		}
-	}
-	return strings.Join(fmtArgs, " ")
 }
