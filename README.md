@@ -6,6 +6,9 @@
   <a href="https://github.com/ankddev/zapret-discord-youtube"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ankddev/zapret-discord-youtube?style=flat"></a>
 </div>
 
+> [!WARNING]
+> Currently zapret may not work for some users
+
 [README на русском языке](./README.RU.md)
 
 This build includes files from [original repository](https://github.com/bol-van/zapret-win-bundle), custom pre-configs for fixing YouTube, Discord, Viber or other services in Russia and some useful utilities, written in Go.
