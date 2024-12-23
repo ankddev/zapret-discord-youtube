@@ -6,6 +6,9 @@
   <a href="https://github.com/ankddev/zapret-discord-youtube"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ankddev/zapret-discord-youtube?style=flat"></a>
 </div>
 
+> [!WARNING]
+> На данный момент zapret может не работать у некоторых пользователей
+
 Эта сбока включает в себя файлы из [оригинального репозитория](https://github.com/bol-van/zapret-win-bundle), кастомные пре-конфиги для исправления работы YouTube, Discord, Viber или других сервисов в России и некоторые полезные утилиты, написанные на Go.
 # Настройка
 ## Скачать
