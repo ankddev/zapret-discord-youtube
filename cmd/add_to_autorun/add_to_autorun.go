@@ -348,3 +348,46 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+func (sm *ServiceManager) createService() error {
+	fmt.Println("=== Creating service ===")
+
+	// Get absolute path to executable
+	exePath, err := sm.getExecutablePath()
+	if err != nil {
+		return err
+	}
+
+	// Create service with auto-start
+	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'create %s start= auto binPath= \"%s\"' -Verb RunAs", sm.serviceName, exePath))
+	if err != nil {
+		return fmt.Errorf("error creating service: %v", err)
+	}
+	fmt.Printf("%s✓ Service created successfully.%s\n", colorGreen, colorReset)
+
+	// Set description
+	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'description %s \"Service for bypassing DPI blocks\"' -Verb RunAs", sm.serviceName))
+	if err != nil {
+		fmt.Printf("%s⚠ Error setting service description: %v%s\n", colorRed, err, colorReset)
+	} else {
+		fmt.Printf("%s✓ Service description set.%s\n", colorGreen, colorReset)
+	}
+
+	// Configure service recovery options
+	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'failure %s reset= 0 actions= restart/60000' -Verb RunAs", sm.serviceName))
+	if err != nil {
+		fmt.Printf("%s⚠ Error setting service recovery options: %v%s\n", colorRed, err, colorReset)
+	} else {
+		fmt.Printf("%s✓ Service recovery options set.%s\n", colorGreen, colorReset)
+	}
+
+	return nil
+}
+
+func (sm *ServiceManager) getExecutablePath() (string, error) {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(currentDir, "bin", "winws.exe"), nil
+}
