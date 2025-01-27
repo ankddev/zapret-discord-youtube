@@ -3,7 +3,7 @@ module github.com/ankddev/zapret-discord-youtube
 go 1.23.1
 
 require (
-	github.com/briandowns/spinner v1.23.1
+	github.com/briandowns/spinner v1.23.2
 	github.com/cli/safeexec v1.0.1
 	github.com/eiannone/keyboard v0.0.0-20220611211555-0d226195f203
 	golang.org/x/mod v0.22.0
