@@ -50,6 +50,7 @@ type Release struct {
 	Assets  []struct {
 		Name               string `json:"name"`
 		BrowserDownloadURL string `json:"browser_download_url"`
+		DownloadCount      int    `json:"download_count"`
 	} `json:"assets"`
 }
 
@@ -173,6 +174,20 @@ func main() {
 
 	remoteVersion = strings.TrimPrefix(remoteVersion, "v")
 
+	// Get latest release info first
+	release, err := getLatestRelease()
+	if err != nil {
+		fmt.Printf("%sError getting release information: %v%s\n", colorRed, err, colorReset)
+		waitForEnter()
+		return
+	}
+
+	// Calculate total downloads
+	totalDownloads := 0
+	for _, asset := range release.Assets {
+		totalDownloads += asset.DownloadCount
+	}
+
 	// Compare versions using semver
 	if semver.Compare("v"+currentVersion, "v"+remoteVersion) >= 0 {
 		fmt.Printf("%sYou have the latest version (%s)%s\n", colorGreen, version, colorReset)
@@ -182,6 +197,7 @@ func main() {
 
 	// Ask user about update
 	fmt.Printf("%sNew version available: %s (current: %s)%s\n", colorCyan, remoteVersion, currentVersion, colorReset)
+	fmt.Printf("This version has been downloaded %d times\n", totalDownloads)
 	fmt.Print("Do you want to download the update? [y/N]: ")
 
 	reader := bufio.NewReader(os.Stdin)
@@ -190,14 +206,6 @@ func main() {
 
 	if answer != "y" && answer != "yes" {
 		fmt.Println("Update cancelled.")
-		waitForEnter()
-		return
-	}
-
-	// Get latest release info
-	release, err := getLatestRelease()
-	if err != nil {
-		fmt.Printf("%sError getting release information: %v%s\n", colorRed, err, colorReset)
 		waitForEnter()
 		return
 	}
