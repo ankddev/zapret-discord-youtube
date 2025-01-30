@@ -13,7 +13,6 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/cli/safeexec"
-	
 )
 
 func main() {
