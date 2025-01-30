@@ -1,0 +1,26 @@
+name: Release
+on:
+  workflow_dispatch:
+  release:
+    types: [ created ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '^1.13.1'
+      - name: Build and make release
+        run: |
+          scripts/build.bat
+      - name: Release to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/zapret-discord-youtube-ankddev.zip
+
