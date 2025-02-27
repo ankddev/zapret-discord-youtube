@@ -19,8 +19,10 @@ jobs:
       - name: Build and make release
         run: |
           scripts/build.bat
+      - name: Rename archive
+        run: rename build/zapret-discord-youtube-ankddev.zip zapret-discord-youtube-ankddev-${{ github.event.release.tag_name }}.zip
       - name: Release to GitHub
         uses: softprops/action-gh-release@v1
         with:
-          files: build/zapret-discord-youtube-ankddev.zip
+          files: build/zapret-discord-youtube-ankddev-${{ github.event.release.tag_name }}.zip
 
