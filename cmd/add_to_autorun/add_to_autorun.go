@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	serviceName         = "discordfix_zapret"
+	serviceName         = "zapret_by_ankddev"
 	clearScreenSequence = "\033[2J\033[H\033[3J"
 	defaultTermHeight   = 24
 	enterAltScreen      = "\033[?1049h"
@@ -60,67 +60,90 @@ func (sm *ServiceManager) runPowershellCommand(command string) (string, error) {
 }
 
 func (sm *ServiceManager) removeService() error {
-	fmt.Println("=== Deleting existing service ===")
+	fmt.Println("=== Removing existing service using nssm remove ===")
+	nssmPath := filepath.Join("bin", "nssm.exe")
 
-	// Stop service
-	fmt.Printf("► Stopping service '%s'...\n", sm.serviceName)
-	_, err := sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'stop %s' -Verb RunAs", sm.serviceName))
+	// Attempt to stop the service; ignore errors.
+	stopCmd := exec.Command(nssmPath, "stop", sm.serviceName)
+	stopCmd.Stdout = os.Stdout
+	stopCmd.Stderr = os.Stderr
+	_ = stopCmd.Run()
+	time.Sleep(2 * time.Second)
+
+	// Attempt service removal.
+	removeCmd := exec.Command(nssmPath, "remove", sm.serviceName, "confirm")
+	removeCmd.Stdout = nil
+	removeCmd.Stderr = nil
+	err := removeCmd.Run()
 	if err != nil {
-		fmt.Printf("%s⚠ Error while stopping service: %v%s\n", colorRed, err, colorReset)
+		errMsg := err.Error()
+		// If error indicates the service is not present or exit status 3, ignore it.
+		if strings.Contains(errMsg, "Указанная служба не установлена") ||
+			strings.Contains(strings.ToLower(errMsg), "not found") ||
+			strings.Contains(errMsg, "marked for deletion") ||
+			strings.Contains(errMsg, "can't open service") ||
+			strings.Contains(errMsg, "exit status 3") {
+			fmt.Println("Service not found or already marked for deletion; continuing...")
+			err = nil
+		} else {
+			fmt.Printf("%s⚠ Error while removing service via nssm: %v%s\n", colorRed, err, colorReset)
+			return err
+		}
 	} else {
-		fmt.Printf("%s✓ Service stopped successfully.%s\n", colorGreen, colorReset)
+		fmt.Printf("%s✓ Service removed successfully via nssm.%s\n", colorGreen, colorReset)
 	}
-
-	// Terminate process
-	fmt.Println("► Shutting down process 'winws.exe'...")
-	_, err = sm.runPowershellCommand("Start-Process 'powershell' -ArgumentList 'Stop-Process -Name \"winws\" -Force' -Verb RunAs")
-	if err != nil {
-		fmt.Printf("%s⚠ Error while terminating process: %v%s\n", colorRed, err, colorReset)
-	} else {
-		fmt.Printf("%s✓ Process terminated successfully.%s\n", colorGreen, colorReset)
-	}
-
-	// Delete service
-	fmt.Printf("► Deleting service '%s'...\n", sm.serviceName)
-	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'delete %s' -Verb RunAs", sm.serviceName))
-	if err != nil {
-		fmt.Printf("%s⚠ Error while deleting service: %v%s\n", colorRed, err, colorReset)
-	} else {
-		fmt.Printf("%s✓ Service deleted successfully.%s\n", colorGreen, colorReset)
-	}
-
+	// Allow extra time for Windows to complete deletion.
+	time.Sleep(3 * time.Second)
 	return nil
 }
 
 func (sm *ServiceManager) installService(batFilePath string) error {
-	// First remove existing service
-	err := sm.removeService()
-	if err != nil {
-		return err
-	}
+	// Remove the service and wait until it's fully gone.
+	_ = sm.removeService()
+	nssmPath := filepath.Join("bin", "nssm.exe")
+	_ = exec.Command(nssmPath, "status", sm.serviceName).Run()
 
 	fmt.Println("=== Installing new service ===")
 	fmt.Printf("► Installing file as service: %s\n", batFilePath)
 
-	// Create service
-	createCmd := fmt.Sprintf(
-		`$process = Start-Process 'sc.exe' -ArgumentList 'create %s binPath= "cmd.exe /c \"%s\"" start= auto' -Verb RunAs -PassThru; $process.WaitForExit(); Write-Output $process.ExitCode`,
-		sm.serviceName,
-		batFilePath,
-	)
+	_ = exec.Command(nssmPath, "install", sm.serviceName, "cmd.exe", "/c", batFilePath).Run()
 
-	_, err = sm.runPowershellCommand(createCmd)
-	if err != nil {
-		fmt.Printf("%s⚠ Error while creating service: %v%s\n", colorRed, err, colorReset)
-		return err
-	}
+	time.Sleep(3 * time.Second)
 
-	// Start service
+	// Configure NSSM to ignore exit code 1 to avoid SERVICE_PAUSED issues.
+	setExitCmd := exec.Command(nssmPath, "set", sm.serviceName, "AppExit", "1", "Ignore")
+	setExitCmd.Stdout = os.Stdout
+	setExitCmd.Stderr = os.Stderr
+	_ = setExitCmd.Run()
+
+	// Set AppRestartDelay to 5000 milliseconds.
+	setDelayCmd := exec.Command(nssmPath, "set", sm.serviceName, "AppRestartDelay", "5000")
+	setDelayCmd.Stdout = os.Stdout
+	setDelayCmd.Stderr = os.Stderr
+	_ = setDelayCmd.Run()
+
+	// Start the service.
 	fmt.Println("► Starting service...")
-	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'start %s' -Verb RunAs", sm.serviceName))
+	startCmd := exec.Command(nssmPath, "start", sm.serviceName)
+	startCmd.Stdout = os.Stdout
+	startCmd.Stderr = os.Stderr
+	err := startCmd.Run()
 	if err != nil {
-		fmt.Printf("%s⚠ Error while starting service: %v%s\n", colorRed, err, colorReset)
-		return err
+		errMsg := strings.ToLower(err.Error())
+		if strings.Contains(errMsg, "service_paused") {
+			fmt.Println("Service is paused; attempting restart via nssm restart...")
+			restartCmd := exec.Command(nssmPath, "restart", sm.serviceName)
+			restartCmd.Stdout = os.Stdout
+			restartCmd.Stderr = os.Stderr
+			err = restartCmd.Run()
+			if err != nil {
+				fmt.Printf("%s⚠ Error while restarting service via nssm: %v%s\n", colorRed, err, colorReset)
+				return err
+			}
+		} else {
+			fmt.Printf("%s⚠ Error while starting service via nssm: %v%s\n", colorRed, err, colorReset)
+			return err
+		}
 	}
 
 	fmt.Printf("%s✓ Service started successfully.%s\n", colorGreen, colorReset)
@@ -347,47 +370,4 @@ func max(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func (sm *ServiceManager) createService() error {
-	fmt.Println("=== Creating service ===")
-
-	// Get absolute path to executable
-	exePath, err := sm.getExecutablePath()
-	if err != nil {
-		return err
-	}
-
-	// Create service with auto-start
-	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'create %s start= auto binPath= \"%s\"' -Verb RunAs", sm.serviceName, exePath))
-	if err != nil {
-		return fmt.Errorf("error creating service: %v", err)
-	}
-	fmt.Printf("%s✓ Service created successfully.%s\n", colorGreen, colorReset)
-
-	// Set description
-	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'description %s \"Service for bypassing DPI blocks\"' -Verb RunAs", sm.serviceName))
-	if err != nil {
-		fmt.Printf("%s⚠ Error setting service description: %v%s\n", colorRed, err, colorReset)
-	} else {
-		fmt.Printf("%s✓ Service description set.%s\n", colorGreen, colorReset)
-	}
-
-	// Configure service recovery options
-	_, err = sm.runPowershellCommand(fmt.Sprintf("Start-Process 'sc.exe' -ArgumentList 'failure %s reset= 0 actions= restart/60000' -Verb RunAs", sm.serviceName))
-	if err != nil {
-		fmt.Printf("%s⚠ Error setting service recovery options: %v%s\n", colorRed, err, colorReset)
-	} else {
-		fmt.Printf("%s✓ Service recovery options set.%s\n", colorGreen, colorReset)
-	}
-
-	return nil
-}
-
-func (sm *ServiceManager) getExecutablePath() (string, error) {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(currentDir, "bin", "winws.exe"), nil
 }
