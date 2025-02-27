@@ -20,7 +20,7 @@ jobs:
         run: |
           scripts/build.bat
       - name: Rename archive
-        run: Rename-Item -Path build/zapret-discord-youtube-ankddev.zip -NewItem zapret-discord-youtube-ankddev-${{ github.event.release.tag_name }}.zip
+        run: Rename-Item -Path build/zapret-discord-youtube-ankddev.zip -NewPath zapret-discord-youtube-ankddev-${{ github.event.release.tag_name }}.zip
       - name: Release to GitHub
         uses: softprops/action-gh-release@v1
         with:
