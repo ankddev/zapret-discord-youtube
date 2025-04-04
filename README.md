@@ -26,6 +26,7 @@ You can update this build by running `Check for updates.exe`. It will check for 
   * DiscordFix - Discord
   * YouTubeFix - YouTube
   * ViberFix - Viber
+  * CloudflareFix - Cloudflare
 * Enjoy it!
 
 > [!TIP]

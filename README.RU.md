@@ -26,6 +26,7 @@
   * DiscordFix - Discord
   * YouTubeFix - YouTube
   * ViberFix - Viber
+  * CloudflareFix - Cloudflare
 * Наслаждайтесь!
 
 > [!TIP]
