@@ -27,6 +27,7 @@ You can update this build by running `Check for updates.exe`. It will check for 
   * YouTubeFix - YouTube
   * ViberFix - Viber
   * CloudflareFix - Cloudflare
+  * UbisoftFix - Ubisoft
 * Enjoy it!
 
 > [!TIP]

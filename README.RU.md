@@ -27,6 +27,7 @@
   * YouTubeFix - YouTube
   * ViberFix - Viber
   * CloudflareFix - Cloudflare
+  * UbisoftFix - Ubisoft
 * Наслаждайтесь!
 
 > [!TIP]
