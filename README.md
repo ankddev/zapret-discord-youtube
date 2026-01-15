@@ -7,7 +7,7 @@
 </div>
 
 > [!WARNING]
-> Currently zapret may not work for some users
+> THIS PROJECT IS NOT MAINTAINED ANYMORE! USE ORIGINAL ZAPRET FROM [HERE](https://github.com/Flowseal/zapret-discord-youtube)
 
 [README на русском языке](./README.RU.md)
 
